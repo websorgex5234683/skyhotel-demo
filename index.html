@@ -1169,6 +1169,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 const fmtN = n => n === 1 ? 'L' : String(n).padStart(2, '0');
 let flying = false, skipFly = () => {};
 portal.addEventListener('click', () => skipFly());
+if (!canHover) $('.p-skip', portal).textContent = 'Tap to skip';
 async function flyTo(id) {
   if (flying) return;
   stopDemo();
