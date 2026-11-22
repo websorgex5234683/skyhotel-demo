@@ -453,6 +453,13 @@ h2 em{font-style:italic;color:var(--goldd)}
 .rooms.single .room-body{padding:40px 40px 40px}
 .rooms.single .room h3{font-size:38px}
 
+/* 3D scene */
+.scene canvas.gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y}
+.scene.is-3d #tower{display:none}
+.scene.is-3d .h-desk::before{content:'Move the mouse over the tower to take control · '}
+.scene.is-3d .h-touch::before{content:'Tap the tower to stop the camera · '}
+@media (min-width:861px){.scene.is-3d .tower-hint{left:auto!important;top:auto!important;right:28px;bottom:26px}}
+
 /* responsive */
 @media (max-width:1100px){
   .links{display:none}.burger{display:block}
@@ -576,7 +583,7 @@ h2 em{font-style:italic;color:var(--goldd)}
   <div class="scene">
     <svg id="tower" class="tower" viewBox="0 0 2400 1800" preserveAspectRatio="xMidYMid slice" role="group" aria-label="Interactive photo of the hotel tower. Choose a floor."><image href="images/hero-tower.webp" x="0" y="0" width="2400" height="1800" preserveAspectRatio="none"/></svg>
     <div class="scene-shade"></div>
-    <div class="tower-hint"><span class="dot"></span><span class="h-desk">Hover a floor · click to fly in</span><span class="h-touch">Tap a floor · tap again to fly in</span></div>
+    <div class="tower-hint"><span class="dot"></span><span class="h-desk">click a floor to fly in</span><span class="h-touch">tap a floor twice to fly in</span></div>
     <div class="tip" aria-hidden="true"><div class="t-floor"></div><div class="t-name"></div><div class="t-meta"></div><div class="t-cta"></div></div>
   </div>
   <div class="hero-grid container">
@@ -1060,14 +1067,34 @@ function fitScene() {
   Object.assign(hint.style, {left: (zr.right - sr.left + 16) + 'px', top: (zr.top - sr.top + 10) + 'px'});
 }
 
-/* interactions */
+/* interactions (photo fallback; the 3D module swaps towerAPI) */
 const tip = $('.tip'), hint = $('.tower-hint');
 let active = null, demoT = null, touched = false;
+const photoAPI = {
+  kind: 'photo',
+  highlight(id) { $$('.zone', tower).forEach(z => z.classList.toggle('active', z.dataset.id === id)); tower.classList.toggle('has-active', !!id); },
+  rect(id) { return tower.querySelector(`.zone[data-id="${id}"] .hl`).getBoundingClientRect(); },
+  fly(id) {
+    const zr = this.rect(id), wr = tower.getBoundingClientRect(), clone = tower.cloneNode(true);
+    clone.removeAttribute('id');
+    Object.assign(clone.style, {position: 'absolute', left: wr.left + 'px', top: wr.top + 'px', width: wr.width + 'px', height: wr.height + 'px', transformOrigin: '0 0'});
+    pTower.replaceChildren(clone);
+    const s = Math.min(14, Math.max(innerWidth / zr.width, innerHeight / zr.height) * 1.25);
+    const cx = zr.left + zr.width / 2, cy = zr.top + zr.height / 2;
+    const tx = innerWidth / 2 - wr.left - s * (cx - wr.left), ty = innerHeight / 2 - wr.top - s * (cy - wr.top);
+    return [
+      pBg.animate([{opacity: 0}, {opacity: 1}], {duration: 200, fill: 'forwards'}),
+      clone.animate([{transform: 'none', filter: 'blur(0px) brightness(1)'}, {transform: `translate(${tx}px,${ty}px) scale(${s})`, filter: 'blur(5px) brightness(1.25)'}], {duration: 1300, easing: 'cubic-bezier(.65,0,.2,1)', fill: 'forwards'}),
+      clone.animate([{opacity: 1}, {opacity: 0}], {duration: 380, delay: 1150, fill: 'forwards'})
+    ];
+  },
+  reset() { pTower.replaceChildren(); }
+};
+let towerAPI = photoAPI;
 fitScene();
 addEventListener('resize', () => { fitScene(); if (active) positionTip(active); });
 function positionTip(id) {
-  const hl = tower.querySelector(`.zone[data-id="${id}"] .hl`);
-  const zr = hl.getBoundingClientRect(), sr = scene.getBoundingClientRect(), tw = tip.offsetWidth || 230;
+  const zr = towerAPI.rect(id), sr = scene.getBoundingClientRect(), tw = tip.offsetWidth || 230;
   let x = zr.right - sr.left + 18, y = zr.top + zr.height / 2 - sr.top;
   tip.classList.remove('left', 'over');
   if (sr.left + x + tw > innerWidth - 10) {
@@ -1083,8 +1110,7 @@ function positionTip(id) {
 }
 function setActive(id) {
   active = id;
-  $$('.zone', tower).forEach(z => z.classList.toggle('active', z.dataset.id === id));
-  tower.classList.toggle('has-active', !!id);
+  towerAPI.highlight(id);
   $$('.fbtn').forEach(b => b.classList.toggle('active', b.dataset.id === id));
   if (!id) { tip.classList.remove('show'); return; }
   const f = byId(id);
@@ -1134,28 +1160,17 @@ async function flyTo(id) {
   flying = true;
   const f = byId(id);
   setActive(id); tip.classList.remove('show');
-  const zr = tower.querySelector(`.zone[data-id="${id}"] .hl`).getBoundingClientRect(), wr = tower.getBoundingClientRect();
-  const clone = tower.cloneNode(true);
-  clone.removeAttribute('id');
-  Object.assign(clone.style, {position: 'absolute', left: wr.left + 'px', top: wr.top + 'px', width: wr.width + 'px', height: wr.height + 'px', transformOrigin: '0 0'});
-  pTower.replaceChildren(clone);
   pPhoto.style.backgroundImage = `url(images/${PHOTOS[id]}.webp)`;
   $('.pl-name', portal).textContent = f.name;
   const target = f.num === 'L' ? 1 : +f.num;
   let n = 1; plN.textContent = fmtN(1);
   portal.classList.add('on');
-  const s = Math.min(14, Math.max(innerWidth / zr.width, innerHeight / zr.height) * 1.25);
-  const cx = zr.left + zr.width / 2, cy = zr.top + zr.height / 2;
-  const tx = innerWidth / 2 - wr.left - s * (cx - wr.left), ty = innerHeight / 2 - wr.top - s * (cy - wr.top);
-  const anims = [
-    pBg.animate([{opacity: 0}, {opacity: 1}], {duration: 200, fill: 'forwards'}),
-    clone.animate([{transform: 'none', filter: 'blur(0px) brightness(1)'}, {transform: `translate(${tx}px,${ty}px) scale(${s})`, filter: 'blur(5px) brightness(1.25)'}], {duration: 1300, easing: 'cubic-bezier(.65,0,.2,1)', fill: 'forwards'}),
-    clone.animate([{opacity: 1}, {opacity: 0}], {duration: 380, delay: 1150, fill: 'forwards'}),
+  const anims = [...towerAPI.fly(id),
     pLabel.animate([{opacity: 0, transform: 'translateY(26px)'}, {opacity: 1, transform: 'none'}], {duration: 550, delay: 180, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'forwards'}),
-    pPhoto.animate([{opacity: 0, transform: 'scale(1.4)', filter: 'blur(14px)'}, {opacity: 1, transform: 'scale(1.06)', filter: 'blur(0px)'}], {duration: 800, delay: 750, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'forwards'})
+    pPhoto.animate([{opacity: 0, transform: 'scale(1.4)', filter: 'blur(14px)'}, {opacity: 1, transform: 'scale(1.06)', filter: 'blur(0px)'}], {duration: 800, delay: towerAPI.kind === '3d' ? 1150 : 750, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'forwards'})
   ];
   const ct = target > 1 ? setInterval(() => { n = Math.min(target, n + 1); plN.textContent = fmtN(n); if (n === target) clearInterval(ct); }, 1150 / (target - 1)) : null;
-  await Promise.race([wait(1950), new Promise(r => skipFly = r)]);
+  await Promise.race([wait(towerAPI.kind === '3d' ? 2300 : 1950), new Promise(r => skipFly = r)]);
   clearInterval(ct); plN.textContent = fmtN(target);
   const {t, at} = destination(id);
   window.scrollTo({top: at.getBoundingClientRect().top + scrollY - header.offsetHeight - 14, behavior: 'instant'});
@@ -1165,7 +1180,7 @@ async function flyTo(id) {
   await out.finished;
   portal.classList.remove('on');
   anims.forEach(a => a.cancel()); out.cancel();
-  pTower.replaceChildren(); flying = false; skipFly = () => {};
+  towerAPI.reset(); flying = false; skipFly = () => {};
 }
 
 function stopDemo() { if (!touched && active) setActive(null); touched = true; clearTimeout(demoT); hint.style.opacity = 0; }
@@ -1180,20 +1195,23 @@ $$('.zone', tower).forEach(z => {
   z.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flyTo(id); } });
   z.addEventListener('focus', () => { if (z.matches(':focus-visible')) { stopDemo(); setActive(id); } });
 });
-tower.addEventListener('mouseleave', () => { if (canHover && !flying) setActive(null); });
+tower.addEventListener('mouseleave', () => { if (canHover && !flying && towerAPI.kind === 'photo') setActive(null); });
 document.addEventListener('click', e => { if (!canHover && active && !flying && !e.target.closest('.zone') && !e.target.closest('.fbtn')) setActive(null); });
 $$('.fbtn').forEach(b => {
-  b.addEventListener('mouseenter', () => { if (canHover) { stopDemo(); setActive(b.dataset.id); } });
-  b.addEventListener('mouseleave', () => { if (canHover && !flying) setActive(null); });
+  b.addEventListener('mouseenter', () => { if (canHover) { stopDemo(); towerAPI.focus && towerAPI.focus(); setActive(b.dataset.id); } });
+  b.addEventListener('mouseleave', () => { if (canHover && !flying) { setActive(null); towerAPI.unfocus && towerAPI.unfocus(); } });
   b.addEventListener('click', () => flyTo(b.dataset.id));
 });
 setTimeout(() => Object.values(PHOTOS).forEach(p => { const i = new Image(); i.src = `images/${p}.webp`; }), 3000);
 if (!reduce) {
   const seq = ['skybar', 'suite', 'spa', 'restaurant']; let k = 0;
-  const run = () => { if (touched) return; if (k < seq.length) { setActive(seq[k++]); demoT = setTimeout(run, 1500); } else setActive(null); };
+  const run = () => { if (touched || towerAPI.kind !== 'photo') return; if (k < seq.length) { setActive(seq[k++]); demoT = setTimeout(run, 1500); } else setActive(null); };
   demoT = setTimeout(run, 2200);
 }
 window.__tower = {setActive, stopDemo, flyTo, filterRooms};
+window.Altura = {setActive, flyTo, positionTip, canHover, rect: id => towerAPI.rect(id),
+  get active() { return active; }, get flying() { return flying; },
+  setAPI(api) { towerAPI = api; clearTimeout(demoT); photoAPI.highlight(null); setActive(null); }};
 
 /* elevator indicator */
 const elev = $('.elev'), en = $('.n', elev), ea = $('.arrow', elev), elbl = $('.lbl', elev);
@@ -1294,5 +1312,6 @@ const upd = () => { const past = hero.getBoundingClientRect().bottom < 60, b = b
 addEventListener('scroll', upd, {passive: true}); upd();
 })();
 </script>
+<script type="module" src="js/tower3d.js"></script>
 </body>
 </html>
