@@ -1212,7 +1212,7 @@ $$('.zone', tower).forEach(z => {
   z.addEventListener('focus', () => { if (z.matches(':focus-visible')) { stopDemo(); setActive(id); } });
 });
 tower.addEventListener('mouseleave', () => { if (canHover && !flying && towerAPI.kind === 'photo') setActive(null); });
-document.addEventListener('click', e => { if (!canHover && active && !flying && !e.target.closest('.zone') && !e.target.closest('.fbtn')) setActive(null); });
+document.addEventListener('click', e => { if (!canHover && active && !flying && !e.target.closest('.zone') && !e.target.closest('.fbtn') && !e.target.closest('canvas.gl')) setActive(null); });
 $$('.fbtn').forEach(b => {
   b.addEventListener('mouseenter', () => { if (canHover) { stopDemo(); towerAPI.focus && towerAPI.focus(); setActive(b.dataset.id); } });
   b.addEventListener('mouseleave', () => { if (canHover && !flying) { setActive(null); towerAPI.unfocus && towerAPI.unfocus(); } });
