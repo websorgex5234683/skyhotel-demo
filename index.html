@@ -456,6 +456,9 @@ h2 em{font-style:italic;color:var(--goldd)}
 .rooms.single .room h3{font-size:38px}
 
 /* 3D scene */
+.m-status{display:none;position:absolute;left:18px;right:18px;bottom:12px;z-index:3;text-align:center;font-size:12.5px;line-height:1.4;color:#cfd5e0;background:rgba(8,13,26,.72);border:1px solid rgba(231,203,146,.3);border-radius:16px;padding:8px 14px;backdrop-filter:blur(8px)}
+.m-status b{color:var(--gold2);font-weight:600}
+.db-short{display:none}
 .scene.pending #tower,.scene.pending .tower-hint,.scene.pending .tip{opacity:0;pointer-events:none}
 .scene canvas.gl{opacity:0;transition:opacity 1.2s var(--ease)}
 .scene.is-3d canvas.gl{opacity:1}
@@ -479,10 +482,16 @@ h2 em{font-style:italic;color:var(--goldd)}
 }
 @media (max-width:860px){
   .hero-grid{column-gap:12px;min-height:0;padding-top:40px}
-  .scene{top:auto;height:560px}
-  .scene-shade{background:linear-gradient(180deg,#0b1430 0%,rgba(11,20,48,0) 16%,rgba(8,13,26,0) 86%,#0a1121 100%),linear-gradient(270deg,rgba(8,13,26,.8) 0%,rgba(8,13,26,0) 48%)}
-  .hero-grid{grid-template-columns:1fr 152px;grid-template-areas:"text text" ". panel";grid-template-rows:auto 560px}
-  .panel{align-self:center;padding-bottom:0}
+  .hero{display:flex;flex-direction:column}
+  .hero-grid{display:contents}
+  .hero-text{order:1;width:calc(100% - 36px);margin:0 auto;padding:30px 0 6px}
+  .scene{order:2;position:relative;inset:auto;height:min(122vw,500px);flex:none}
+  .scene-shade{background:linear-gradient(180deg,#0b1430 0%,rgba(11,20,48,0) 18%,rgba(8,13,26,0) 78%,#0b1330 100%)}
+  .panel{order:3;width:calc(100% - 36px);margin:0 auto;padding:6px 0 30px;align-self:auto}
+  .fgrid{grid-template-columns:1fr 1fr;gap:8px}
+  .tip,.tower-hint{display:none!important}
+  .m-status{display:block}
+  .db-full{display:none}.db-short{display:inline}
   .rooms.single .room.show{grid-template-columns:1fr}
   .rooms.single .room-img{min-height:0;aspect-ratio:4/3.2}
   .rooms.single .thumbs img{width:86px;height:62px}
@@ -497,7 +506,7 @@ h2 em{font-style:italic;color:var(--goldd)}
   .tower-col{padding-left:0}
   .tower-wrap{height:min(500px,118vw)}
   .panel{align-self:end;padding-bottom:26px}
-  .fgrid{grid-template-columns:1fr;gap:6px}
+  .fgrid{grid-template-columns:1fr 1fr;gap:8px}
   .fbtn{padding:5px 10px 5px 5px;gap:9px}
   .fbtn .num{width:32px;height:32px;font-size:14.5px}
   .fbtn .nm{font-size:12.5px}
@@ -549,6 +558,7 @@ h2 em{font-style:italic;color:var(--goldd)}
   .hero h1{font-size:48px}
   .hero-ctas .btn{flex:1;padding:0 16px}
   .drinks,.rev-cards{margin:0 -18px;padding:0 18px 6px}
+  .room-tabs{margin-left:-18px;margin-right:-18px;padding:0 18px}
   .faq summary{font-size:21px}
   .faq details p{padding-right:0}
 }
@@ -561,7 +571,7 @@ h2 em{font-style:italic;color:var(--goldd)}
 </head>
 <body>
 
-<div class="demo-bar">Example website — fictional business, made by <b>Kiril Web Design</b></div>
+<div class="demo-bar"><span class="db-full">Example website — fictional business, made by <b>Kiril Web Design</b></span><span class="db-short">Example site by <b>Kiril Web Design</b></span></div>
 
 <header class="header">
   <nav class="nav container" aria-label="Main">
@@ -589,6 +599,7 @@ h2 em{font-style:italic;color:var(--goldd)}
     <svg id="tower" class="tower" viewBox="0 0 2400 1800" preserveAspectRatio="xMidYMid slice" role="group" aria-label="Interactive photo of the hotel tower. Choose a floor."><image data-href="images/hero-tower.webp" x="0" y="0" width="2400" height="1800" preserveAspectRatio="none"/></svg>
     <div class="scene-shade"></div>
     <div class="tower-hint"><span class="dot"></span><span class="h-desk">click a floor to fly in</span><span class="h-touch">tap a floor twice to fly in</span></div>
+    <div class="m-status" aria-live="polite"></div>
     <div class="tip" aria-hidden="true"><div class="t-floor"></div><div class="t-name"></div><div class="t-meta"></div><div class="t-cta"></div></div>
   </div>
   <div class="hero-grid container">
@@ -791,10 +802,7 @@ h2 em{font-style:italic;color:var(--goldd)}
       <button class="g-item sq"><img src="images/bar.webp" alt="Cloud 60 Sky Bar at night" loading="lazy"></button>
       <button class="g-item"><img src="images/window.webp" alt="Morning light in a Deluxe room" loading="lazy"></button>
       <button class="g-item tall"><img src="images/hallway.webp" alt="Guest corridor" loading="lazy"></button>
-      <button class="g-item"><img src="images/bath.webp" alt="Suite bathroom with rain shower" loading="lazy"></button>
       <button class="g-item sq"><img src="images/dish.webp" alt="Tasting menu at Atelier" loading="lazy"></button>
-      <button class="g-item"><img src="images/lobby-lounge.webp" alt="Lobby lounge" loading="lazy"></button>
-      <button class="g-item tall"><img src="images/city.webp" alt="Harbor City at sunrise" loading="lazy"></button>
     </div>
   </div>
 </section>
@@ -1113,16 +1121,19 @@ function positionTip(id) {
   }
   tip.style.left = x + 'px'; tip.style.top = y + 'px';
 }
-function setActive(id) {
+const mStatus = $('.m-status'), M_DEFAULT = 'Tap the tower to pause · tap a floor twice to fly in';
+mStatus.textContent = M_DEFAULT;
+function setActive(id, auto) {
   active = id;
   towerAPI.highlight(id);
+  if (id) { const f0 = byId(id); mStatus.innerHTML = `<b>${f0.label} · ${f0.name}</b>${auto ? '' : ' — tap again to fly in'}`; } else mStatus.textContent = M_DEFAULT;
   $$('.fbtn').forEach(b => b.classList.toggle('active', b.dataset.id === id));
   if (!id) { tip.classList.remove('show'); return; }
   const f = byId(id);
   $('.t-floor', tip).textContent = f.label;
   $('.t-name', tip).textContent = f.name;
   $('.t-meta', tip).textContent = f.meta;
-  $('.t-cta', tip).textContent = canHover ? 'Click to fly into this floor →' : 'Tap again to fly in →';
+  $('.t-cta', tip).textContent = canHover ? 'Click to fly into this floor →' : 'Tap to fly into this floor →';
   positionTip(id);
   tip.classList.add('show');
 }
