@@ -12,6 +12,7 @@
 <meta property="og:description" content="Hover a floor of the tower and explore it. A fictional hotel, built as a design showcase.">
 <meta property="og:image" content="https://websorgex5234683.github.io/skyhotel-demo/og.jpg">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23080d1a'/%3E%3Cpath d='M16 3v5M12.5 8h7l2.5 5v16H10V13z' fill='none' stroke='%23e7cb92' stroke-width='1.8'/%3E%3Cpath d='M14 16h4M14 20h4M14 24h4' stroke='%23e7cb92' stroke-width='1.4'/%3E%3C/svg%3E">
+<link rel="modulepreload" href="js/tower3d.js">
 <link rel="preload" href="fonts/cg-500.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/mr-500.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -455,6 +456,9 @@ h2 em{font-style:italic;color:var(--goldd)}
 .rooms.single .room h3{font-size:38px}
 
 /* 3D scene */
+.scene.pending #tower,.scene.pending .tower-hint,.scene.pending .tip{opacity:0;pointer-events:none}
+.scene canvas.gl{opacity:0;transition:opacity 1.2s var(--ease)}
+.scene.is-3d canvas.gl{opacity:1}
 .scene canvas.gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y}
 .scene.is-3d #tower{display:none}
 .scene.is-3d .h-desk::before{content:'Move the mouse over the tower to take control · '}
@@ -581,8 +585,8 @@ h2 em{font-style:italic;color:var(--goldd)}
 
 <main>
 <section class="hero" id="top" data-nofloor>
-  <div class="scene">
-    <svg id="tower" class="tower" viewBox="0 0 2400 1800" preserveAspectRatio="xMidYMid slice" role="group" aria-label="Interactive photo of the hotel tower. Choose a floor."><image href="images/hero-tower.webp" x="0" y="0" width="2400" height="1800" preserveAspectRatio="none"/></svg>
+  <div class="scene pending">
+    <svg id="tower" class="tower" viewBox="0 0 2400 1800" preserveAspectRatio="xMidYMid slice" role="group" aria-label="Interactive photo of the hotel tower. Choose a floor."><image data-href="images/hero-tower.webp" x="0" y="0" width="2400" height="1800" preserveAspectRatio="none"/></svg>
     <div class="scene-shade"></div>
     <div class="tower-hint"><span class="dot"></span><span class="h-desk">click a floor to fly in</span><span class="h-touch">tap a floor twice to fly in</span></div>
     <div class="tip" aria-hidden="true"><div class="t-floor"></div><div class="t-name"></div><div class="t-meta"></div><div class="t-cta"></div></div>
@@ -1206,9 +1210,16 @@ $$('.fbtn').forEach(b => {
 setTimeout(() => Object.values(PHOTOS).forEach(p => { const i = new Image(); i.src = `images/${p}.webp`; }), 3000);
 if (!reduce) {
   const seq = ['skybar', 'suite', 'spa', 'restaurant']; let k = 0;
-  const run = () => { if (touched || towerAPI.kind !== 'photo') return; if (k < seq.length) { setActive(seq[k++]); demoT = setTimeout(run, 1500); } else setActive(null); };
+  const run = () => { if (touched || towerAPI.kind !== 'photo' || scene.classList.contains('pending')) return; if (k < seq.length) { setActive(seq[k++]); demoT = setTimeout(run, 1500); } else setActive(null); };
   demoT = setTimeout(run, 2200);
 }
+function usePhoto() {
+  if (scene.classList.contains('is-3d')) return;
+  const img = $('image', tower); img.setAttribute('href', img.dataset.href);
+  scene.classList.remove('pending');
+}
+const hasGL = (() => { try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch (e) { return false; } })();
+if (!hasGL) usePhoto(); else setTimeout(usePhoto, 8000);
 window.__tower = {setActive, stopDemo, flyTo, filterRooms};
 window.Altura = {setActive, flyTo, positionTip, canHover, rect: id => towerAPI.rect(id),
   get active() { return active; }, get flying() { return flying; },
