@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Altura Sky Hotel — 60 floors above Harbor City · Example website</title>
+<meta name="description" content="Example website for a fictional skyscraper hotel: an interactive 60-floor tower, rooms, rooftop sky bar, spa and booking. Designed by Kiril Web Design.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#080d1a">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Altura Sky Hotel — example website by Kiril Web Design">
+<meta property="og:description" content="Hover a floor of the tower and explore it. A fictional hotel, built as a design showcase.">
+<meta property="og:image" content="https://websorgex5234683.github.io/skyhotel-demo/og.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23080d1a'/%3E%3Cpath d='M16 3v5M12.5 8h7l2.5 5v16H10V13z' fill='none' stroke='%23e7cb92' stroke-width='1.8'/%3E%3Cpath d='M14 16h4M14 20h4M14 24h4' stroke='%23e7cb92' stroke-width='1.4'/%3E%3C/svg%3E">
+<link rel="preload" href="fonts/cg-500.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/mr-500.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:'Cormorant';src:url(fonts/cg-500.woff2) format('woff2');font-weight:500;font-display:swap}
+@font-face{font-family:'Cormorant';src:url(fonts/cg-600.woff2) format('woff2');font-weight:600;font-display:swap}
+@font-face{font-family:'Cormorant';src:url(fonts/cg-500i.woff2) format('woff2');font-weight:500;font-style:italic;font-display:swap}
+@font-face{font-family:'Manrope';src:url(fonts/mr-400.woff2) format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'Manrope';src:url(fonts/mr-500.woff2) format('woff2');font-weight:500;font-display:swap}
+@font-face{font-family:'Manrope';src:url(fonts/mr-600.woff2) format('woff2');font-weight:600;font-display:swap}
+@font-face{font-family:'Manrope';src:url(fonts/mr-700.woff2) format('woff2');font-weight:700;font-display:swap}
+
+:root{
+  --ink:#080d1a;--navy:#0d1527;--navy2:#131d34;--line:rgba(255,255,255,.1);
+  --gold:#c9a46a;--gold2:#e7cb92;--goldd:#9c7638;
+  --ivory:#f4eee4;--paper:#fbf8f2;--text:#1a2132;--muted:#646c80;
+  --serif:'Cormorant',Georgia,'Times New Roman',serif;--sans:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --r:20px;--ease:cubic-bezier(.2,.7,.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:var(--sans);color:var(--text);background:var(--paper);line-height:1.65;font-size:16px;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+ul{list-style:none}
+.container{width:min(1240px,100% - 48px);margin-inline:auto}
+::selection{background:var(--gold2);color:#111}
+:focus-visible{outline:2px solid var(--gold2);outline-offset:3px}
+
+/* demo bar + header */
+.demo-bar{background:#000;color:#c9ced8;font-size:12.5px;text-align:center;padding:7px 14px;letter-spacing:.02em;line-height:1.4}
+.demo-bar b{color:var(--gold2);font-weight:600}
+.header{position:sticky;top:0;z-index:60;background:var(--ink);transition:background .4s,box-shadow .4s}
+.header.scrolled{background:rgba(8,13,26,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 1px 0 rgba(255,255,255,.07),0 10px 30px rgba(0,0,0,.25)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:76px;color:#fff;gap:24px}
+.logo{display:flex;align-items:center;gap:12px;color:#fff}
+.logo svg{color:var(--gold2);flex:none}
+.logo b{display:block;font-family:var(--serif);font-weight:600;font-size:25px;letter-spacing:.3em;line-height:1}
+.logo small{display:block;font-size:9.5px;letter-spacing:.32em;color:#9aa3b8;margin-top:5px;font-weight:600}
+.links{display:flex;gap:30px;font-size:14px;font-weight:500;color:#d4d8e2}
+.links a{position:relative;padding:6px 0;transition:color .3s}
+.links a::after{content:'';position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--gold2);transform:scaleX(0);transition:transform .35s var(--ease)}
+.links a:hover{color:#fff}.links a:hover::after{transform:scaleX(1)}
+.nav-cta{display:flex;align-items:center;gap:14px}
+.burger{display:none;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);position:relative}
+.burger span{position:absolute;left:13px;right:13px;height:1.5px;background:#fff;transition:.3s}
+.burger span:nth-child(1){top:17px}.burger span:nth-child(2){top:25px}
+.nav-open .burger span:nth-child(1){top:21px;transform:rotate(45deg)}
+.nav-open .burger span:nth-child(2){top:21px;transform:rotate(-45deg)}
+.mnav{position:fixed;inset:0;z-index:55;background:rgba(8,13,26,.97);backdrop-filter:blur(10px);display:flex;flex-direction:column;justify-content:center;padding:100px 32px 40px;gap:6px;opacity:0;visibility:hidden;transition:.35s}
+.nav-open .mnav{opacity:1;visibility:visible}
+.mnav a{font-family:var(--serif);font-size:38px;color:#fff;line-height:1.3;transform:translateY(14px);transition:transform .5s var(--ease)}
+.nav-open .mnav a{transform:none}
+.mnav .btn{margin-top:24px;font-family:var(--sans);font-size:15px;align-self:flex-start}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:52px;padding:0 28px;border-radius:999px;font-weight:600;font-size:14.5px;letter-spacing:.02em;white-space:nowrap;transition:transform .35s var(--ease),box-shadow .35s,background .35s,color .35s,border-color .35s}
+.btn .arr{transition:transform .35s var(--ease)}
+.btn:hover .arr{transform:translateX(4px)}
+.btn-gold{background:linear-gradient(135deg,#ecd29c,#c9a46a 55%,#b0874c);color:#1a1307;box-shadow:0 10px 30px -8px rgba(201,164,106,.55)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 16px 36px -8px rgba(201,164,106,.7)}
+.btn-ghost{border:1px solid rgba(255,255,255,.3);color:#fff}
+.btn-ghost:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.55)}
+.btn-dark{background:var(--navy);color:#fff}
+.btn-dark:hover{background:#1c2949;transform:translateY(-2px)}
+.btn-line{border:1px solid rgba(26,33,50,.25);color:var(--text)}
+.btn-line:hover{border-color:var(--text);background:var(--text);color:#fff}
+.btn-sm{height:42px;padding:0 20px;font-size:13.5px}
+.btn-block{width:100%}
+
+/* hero */
+.hero{position:relative;color:#fff;overflow:hidden;background:radial-gradient(ellipse 70% 45% at 72% 100%,rgba(201,164,106,.3),transparent 70%),linear-gradient(180deg,#080d1a 0%,#0b1430 50%,#1a2042 100%)}
+.stars{position:absolute;inset:0;pointer-events:none}
+.stars span{position:absolute;background:#fff;border-radius:50%;animation:twk 5s ease-in-out infinite}
+@keyframes twk{50%{opacity:.15}}
+.moon{position:absolute;width:90px;height:90px;border-radius:50%;left:47%;top:9%;background:radial-gradient(circle at 40% 40%,#fbf3df,#e8d6ad 55%,#c9ab74);box-shadow:0 0 60px 20px rgba(247,226,180,.16),0 0 160px 60px rgba(247,226,180,.07);opacity:.9}
+.city-bg{position:absolute;left:0;right:0;bottom:0;height:300px;width:100%;pointer-events:none}
+.hero-grid{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);grid-template-areas:"text tower" "panel tower";column-gap:40px;min-height:calc(100svh - 108px);padding-top:36px}
+.hero-text{grid-area:text;align-self:end;padding-bottom:26px}
+.eyebrow{display:inline-flex;align-items:center;gap:14px;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold2);font-weight:600}
+.eyebrow::before{content:'';width:34px;height:1px;background:var(--gold2)}
+.hero h1{font-family:var(--serif);font-weight:500;font-size:clamp(54px,6.3vw,100px);line-height:.92;letter-spacing:-.01em;margin:18px 0 20px}
+.hero h1 em{font-style:italic;background:linear-gradient(100deg,#f6e3b8,#d4ad6e 60%,#b78c4f);-webkit-background-clip:text;background-clip:text;color:transparent;padding-right:.08em}
+.hero p.lead{max-width:500px;color:#c3c9d6;font-size:16.5px}
+.hero-ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+.rating{display:flex;align-items:center;gap:12px;margin-top:22px;font-size:13.5px;color:#aeb5c5}
+.rating .st{color:var(--gold2);letter-spacing:2px}
+.rating b{color:#fff}
+.panel{grid-area:panel;align-self:start;padding-bottom:36px}
+.panel-title{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:#8d96ab;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.panel-title::after{content:'';flex:1;height:1px;background:var(--line)}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:520px}
+.fbtn{display:flex;align-items:center;gap:12px;padding:5px 14px 5px 5px;border-radius:999px;border:1px solid var(--line);background:rgba(12,19,37,.82);backdrop-filter:blur(6px);text-align:left;transition:background .3s,border-color .3s,transform .3s var(--ease)}
+.fbtn .num{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(231,203,146,.45);font-family:var(--serif);font-weight:600;font-size:16px;color:var(--gold2);transition:.3s}
+.fbtn .nm{font-size:13px;font-weight:600;line-height:1.25;color:#e9ecf2}
+.fbtn .nm small{display:block;font-size:11px;color:#8b94a9;font-weight:500}
+.fbtn:hover,.fbtn.active{border-color:rgba(231,203,146,.55);background:rgba(46,40,36,.9)}
+.fbtn.active .num{background:var(--gold2);color:#17120a;box-shadow:0 0 18px rgba(231,203,146,.65)}
+.tower-col{grid-area:tower;display:flex;align-items:flex-end;justify-content:flex-start;padding-left:6%;position:relative}
+.tower-wrap{position:relative;height:min(80vh,820px);aspect-ratio:420/1000;flex:none}
+.tower-wrap svg{width:100%;height:100%;overflow:visible;display:block}
+.tower-hint{position:absolute;top:13%;left:calc(100% - 20px);white-space:nowrap;display:flex;align-items:center;gap:10px;font-size:12px;color:#cbd1dc;background:rgba(255,255,255,.06);border:1px solid var(--line);padding:7px 14px 7px 10px;border-radius:999px;backdrop-filter:blur(6px);transition:opacity .4s}
+.tower-hint .dot{width:8px;height:8px;border-radius:50%;background:var(--gold2);box-shadow:0 0 0 0 rgba(231,203,146,.6);animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 10px rgba(231,203,146,0)}100%{box-shadow:0 0 0 0 rgba(231,203,146,0)}}
+.h-touch{display:none}
+.tip{position:absolute;left:0;top:0;z-index:5;transform:translateY(-50%) translateX(-6px);pointer-events:none;opacity:0;transition:opacity .25s,transform .3s var(--ease);background:rgba(11,18,36,.94);border:1px solid rgba(231,203,146,.45);border-radius:16px;padding:13px 18px 14px;width:236px;backdrop-filter:blur(10px);box-shadow:0 24px 50px rgba(0,0,0,.5)}
+.tip.show{opacity:1;transform:translateY(-50%)}
+.tip::before{content:'';position:absolute;right:100%;top:50%;width:22px;height:1px;background:linear-gradient(90deg,transparent,var(--gold2))}
+.tip.left::before{right:auto;left:100%;background:linear-gradient(270deg,transparent,var(--gold2))}
+.tip.over{transform:translateY(-100%)}
+.tip.over::before{display:none}
+.t-floor{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold2);font-weight:700}
+.t-name{font-family:var(--serif);font-size:25px;line-height:1.05;margin:4px 0 5px;color:#fff}
+.t-meta{font-size:12.5px;color:#b5bccb}
+.t-cta{font-size:12px;color:var(--gold2);margin-top:9px;font-weight:600}
+
+/* tower svg */
+.w{fill:#18233d;transition:fill .35s}
+.w.l{fill:#f2cd85}.w.l.cool{fill:#d3e2ff}.w.l.teal{fill:#86e0ef}.w.l.warm{fill:#f4b768}.w.l.lobby{fill:url(#lobbyLight)}.w.l.door{fill:#fff0cc}
+.boot .w.l{animation:on .7s var(--d,0ms) both}
+@keyframes on{from{fill:#18233d}}
+.ready .w.l.tw{animation:tw var(--t,14s) ease-in-out var(--td,0s) infinite}
+@keyframes tw{0%,58%{fill:#f2cd85}64%,92%{fill:#18233d}100%{fill:#f2cd85}}
+.zone{transition:opacity .35s,filter .35s;outline:none}
+.zone .hl{fill:rgba(231,203,146,0);stroke:rgba(231,203,146,0);stroke-width:1.4;transition:.35s;pointer-events:none}
+.zone .hit{fill:transparent;cursor:pointer}
+.zone.active .hl{fill:rgba(231,203,146,.13);stroke:#e7cb92}
+.zone.active .w{fill:#ffe0a0!important;fill-opacity:1!important;animation:none!important}
+.zone.active .w.teal{fill:#b4f3fc!important}
+.zone.active{filter:drop-shadow(0 0 12px rgba(231,203,146,.5))}
+.tower.has-active .zone:not(.active){opacity:.36}
+.zone:focus-visible .hl{stroke:#fff}
+.deco,.ledge{pointer-events:none}
+.beacon,.beacon-g{animation:blink 1.8s infinite}
+@keyframes blink{0%,55%,100%{opacity:1}28%{opacity:.12}}
+.halo{animation:halo 5s ease-in-out infinite alternate}
+@keyframes halo{from{opacity:.45}to{opacity:.85}}
+
+/* stats */
+.stats{background:#0a1121;color:#fff;border-top:1px solid var(--line)}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+.stat{padding:34px 10px;text-align:center;border-left:1px solid var(--line)}
+.stat:first-child{border-left:0}
+.stat b{display:block;font-family:var(--serif);font-weight:500;font-size:46px;line-height:1;color:var(--gold2)}
+.stat span{display:block;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:#8d96ab;margin-top:10px;font-weight:600}
+
+/* sections */
+.sec{padding:clamp(84px,10vw,140px) 0;scroll-margin-top:76px;position:relative}
+.sec-light{background:var(--paper)}
+.sec-ivory{background:var(--ivory)}
+.sec-dark{background:var(--navy);color:#fff}
+.floor-tag{display:inline-flex;align-items:center;gap:12px;font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;font-weight:700;color:var(--goldd);border-radius:999px}
+.floor-tag i{font-style:normal;font-family:var(--serif);font-weight:600;font-size:16px;letter-spacing:0;min-width:42px;height:42px;padding:0 10px;border-radius:999px;border:1px solid currentColor;display:inline-grid;place-items:center}
+.sec-dark .floor-tag,.skybar .floor-tag,.booking .floor-tag{color:var(--gold2)}
+h2{font-family:var(--serif);font-weight:500;font-size:clamp(40px,4.8vw,66px);line-height:1;letter-spacing:-.005em;margin:20px 0 20px}
+h2 em{font-style:italic;color:var(--goldd)}
+.sec-dark h2 em,.skybar h2 em,.booking h2 em,.loc h2 em{color:var(--gold2)}
+.sec-head{max-width:740px;margin-bottom:56px}
+.sec-head.center{text-align:center;margin-inline:auto}
+.lead2{font-size:17px;color:var(--muted)}
+.sec-dark .lead2,.skybar .lead2{color:#b3bacb}
+.split{display:grid;grid-template-columns:1.05fr 1fr;gap:clamp(40px,7vw,110px);align-items:center}
+.split.rev .media{order:2}
+.media{position:relative}
+.media>img:first-child{width:100%;aspect-ratio:4/4.6;object-fit:cover;border-radius:var(--r)}
+.media-sub{position:absolute;width:42%;right:-7%;bottom:-9%;aspect-ratio:1;object-fit:cover;border-radius:16px;border:7px solid var(--paper);box-shadow:0 30px 60px -20px rgba(10,16,32,.45)}
+.sec-dark .media-sub{border-color:var(--navy)}
+.split.rev .media-sub{right:auto;left:-7%}
+.copy p{color:var(--muted);font-size:16.5px}
+.sec-dark .copy p{color:#b3bacb}
+.ticks{margin:26px 0 34px;display:grid;gap:12px}
+.ticks li{display:flex;gap:14px;align-items:flex-start;font-size:15.5px}
+.ticks li::before{content:'';flex:none;width:20px;height:20px;margin-top:2px;border-radius:50%;background:rgba(201,164,106,.16) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M6 10.5l2.6 2.5L14 7.5' fill='none' stroke='%239c7638' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat}
+.sec-dark .ticks li::before,.booking .ticks li::before{background-color:rgba(231,203,146,.14);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M6 10.5l2.6 2.5L14 7.5' fill='none' stroke='%23e7cb92' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity 1s var(--ease),transform 1s var(--ease);transition-delay:calc(var(--i,0) * 90ms)}
+.reveal.in{opacity:1;transform:none}
+.arrive{animation:arrive 1.9s var(--ease)}
+@keyframes arrive{0%{box-shadow:0 0 0 0 rgba(231,203,146,.9)}100%{box-shadow:0 0 0 22px rgba(231,203,146,0)}}
+
+/* rooms */
+.rooms{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.room{background:#fff;border-radius:24px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 1px 0 rgba(0,0,0,.03),0 30px 60px -34px rgba(16,24,48,.35);transition:transform .5s var(--ease),box-shadow .5s;scroll-margin-top:110px;position:relative}
+.room:hover{transform:translateY(-6px);box-shadow:0 40px 70px -34px rgba(16,24,48,.45)}
+.room-img{position:relative;overflow:hidden;aspect-ratio:4/3}
+.room-img img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s var(--ease)}
+.room:hover .room-img img{transform:scale(1.06)}
+.badge{position:absolute;left:16px;top:16px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:#fff;background:rgba(8,13,26,.62);backdrop-filter:blur(8px);padding:8px 13px;border-radius:999px}
+.ribbon{position:absolute;right:16px;top:16px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;background:var(--gold2);color:#1a1307;padding:8px 13px;border-radius:999px}
+.room.featured{outline:1.5px solid var(--gold);outline-offset:-1.5px}
+.room-body{padding:26px 26px 28px;display:flex;flex-direction:column;flex:1}
+.room-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.room h3{font-family:var(--serif);font-weight:600;font-size:30px;line-height:1.05}
+.price{text-align:right;white-space:nowrap}
+.price b{font-family:var(--serif);font-size:30px;font-weight:600;color:var(--goldd)}
+.price span{font-size:12.5px;color:var(--muted);margin-left:3px}
+.room-body>p{color:var(--muted);font-size:15px;margin:10px 0 18px}
+.specs{display:flex;gap:18px;font-size:13px;font-weight:600;color:var(--text);padding:14px 0;border-top:1px solid #ece6db;border-bottom:1px solid #ece6db}
+.specs li{display:flex;align-items:center;gap:7px}
+.specs svg{color:var(--goldd)}
+.amen{display:flex;flex-wrap:wrap;gap:7px;margin:18px 0 24px}
+.amen li{font-size:12.5px;padding:6px 12px;border-radius:999px;background:var(--ivory);color:#4a5163}
+.room .btn{margin-top:auto}
+
+/* restaurant */
+.menu{margin:26px 0 10px}
+.menu li{display:flex;align-items:baseline;gap:12px;padding:15px 0;border-bottom:1px solid var(--line);font-size:15.5px}
+.menu li span small{display:block;font-size:12.5px;color:#8b94a9}
+.menu li i{flex:1;border-bottom:1px dotted rgba(255,255,255,.22);transform:translateY(-5px)}
+.menu li b{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--gold2)}
+.hours{display:flex;gap:26px;flex-wrap:wrap;margin:22px 0 32px;font-size:13.5px;color:#aab2c3}
+.hours b{display:block;color:#fff;font-weight:600;font-size:14.5px}
+
+/* spa */
+.spa-hero{position:relative;border-radius:28px;overflow:hidden;aspect-ratio:21/9}
+.spa-hero img{width:100%;height:100%;object-fit:cover;transform:scale(1.04);transition:transform 2s var(--ease)}
+.spa-hero.in img{transform:none}
+.spa-hero::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(8,13,26,.65),transparent 55%)}
+.spa-cap{position:absolute;left:32px;bottom:28px;z-index:1;color:#fff;display:flex;gap:34px;flex-wrap:wrap}
+.spa-cap b{display:block;font-family:var(--serif);font-size:40px;font-weight:500;line-height:1;color:var(--gold2)}
+.spa-cap span{font-size:13px;color:#d5dae4}
+.spa-grid{display:grid;grid-template-columns:1fr 1fr 1.1fr;gap:26px;margin-top:26px}
+.treat{background:#fff;border-radius:22px;overflow:hidden;box-shadow:0 30px 60px -38px rgba(16,24,48,.35)}
+.treat img{width:100%;aspect-ratio:16/10;object-fit:cover}
+.treat>div{padding:22px 24px 24px;display:flex;justify-content:space-between;gap:12px;align-items:flex-end}
+.treat h3{font-family:var(--serif);font-weight:600;font-size:25px;line-height:1.1}
+.treat p{font-size:13.5px;color:var(--muted);margin-top:4px}
+.treat b{font-family:var(--serif);font-size:28px;color:var(--goldd);font-weight:600}
+.spa-info{background:var(--navy);color:#fff;border-radius:22px;padding:32px 30px;display:flex;flex-direction:column}
+.spa-info h3{font-family:var(--serif);font-weight:500;font-size:28px}
+.spa-info .ticks{margin:20px 0 26px;gap:10px}
+.spa-info .ticks li{font-size:14.5px;color:#d5dae4}
+.spa-info .ticks li::before{background-color:rgba(231,203,146,.14);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M6 10.5l2.6 2.5L14 7.5' fill='none' stroke='%23e7cb92' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.spa-info .btn{margin-top:auto}
+
+/* conference */
+.venues{margin:26px 0 30px;border-top:1px solid #e3dccf}
+.venues li{display:grid;grid-template-columns:1fr auto;gap:4px 20px;padding:17px 0;border-bottom:1px solid #e3dccf}
+.venues b{font-family:var(--serif);font-size:23px;font-weight:600}
+.venues span{font-size:13px;color:var(--muted)}
+.venues em{grid-row:span 2;align-self:center;font-style:normal;font-size:13px;font-weight:700;color:var(--goldd);background:rgba(201,164,106,.13);padding:7px 13px;border-radius:999px;white-space:nowrap}
+
+/* sky bar */
+.skybar{color:#fff;background:#05070f;overflow:hidden}
+.skybar-bg{position:absolute;inset:0;background:url(images/skyline.webp) center/cover;opacity:.6}
+.skybar::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,#0d1527 0%,rgba(8,13,26,.3) 32%,rgba(8,13,26,.55) 70%,#080d1a 100%)}
+.skybar .container{position:relative;z-index:2}
+.drinks{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.drink{border-radius:22px;overflow:hidden;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:transform .5s var(--ease)}
+.drink:hover{transform:translateY(-6px)}
+.drink img{width:100%;aspect-ratio:4/3.4;object-fit:cover}
+.drink>div{padding:20px 22px 22px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.drink h3{font-family:var(--serif);font-weight:600;font-size:25px;line-height:1.1}
+.drink p{font-size:13px;color:#aeb6c7;margin-top:3px}
+.drink b{font-family:var(--serif);font-size:26px;color:var(--gold2);font-weight:600}
+.sky-info{margin-top:40px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:26px 30px;border-radius:22px;border:1px solid rgba(231,203,146,.3);background:rgba(8,13,26,.55);backdrop-filter:blur(10px)}
+.sky-info ul{display:flex;gap:34px;flex-wrap:wrap;font-size:13px;color:#aab2c3}
+.sky-info ul b{display:block;color:#fff;font-size:15px;font-weight:600}
+
+/* gallery */
+.gallery{columns:3;column-gap:16px}
+.g-item{display:block;width:100%;margin-bottom:16px;break-inside:avoid;border-radius:16px;overflow:hidden;position:relative}
+.g-item img{width:100%;aspect-ratio:4/3;object-fit:cover;transition:transform 1.1s var(--ease),filter .5s}
+.g-item.tall img{aspect-ratio:3/4}.g-item.sq img{aspect-ratio:1}
+.g-item::after{content:'＋';position:absolute;right:14px;bottom:14px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.92);color:#111;font-size:18px;opacity:0;transform:scale(.7);transition:.4s var(--ease)}
+.g-item:hover img{transform:scale(1.05)}
+.g-item:hover::after{opacity:1;transform:none}
+.lightbox{position:fixed;inset:0;z-index:90;background:rgba(5,8,16,.94);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:.35s;padding:60px 70px}
+.lightbox.open{opacity:1;visibility:visible}
+.lightbox img{max-width:100%;max-height:100%;border-radius:12px;object-fit:contain}
+.lb-btn{position:absolute;width:50px;height:50px;border-radius:50%;border:1px solid rgba(255,255,255,.25);color:#fff;font-size:20px;display:grid;place-items:center;transition:background .3s}
+.lb-btn:hover{background:rgba(255,255,255,.1)}
+.lb-prev{left:16px;top:50%;margin-top:-25px}.lb-next{right:16px;top:50%;margin-top:-25px}.lb-close{right:16px;top:16px}
+.lb-cap{position:absolute;bottom:18px;left:0;right:0;text-align:center;color:#aab2c3;font-size:13px}
+
+/* reviews */
+.rev-grid{display:grid;grid-template-columns:360px 1fr;gap:34px;align-items:start}
+.score{background:var(--navy);color:#fff;border-radius:24px;padding:34px 32px}
+.score .big{font-family:var(--serif);font-size:88px;line-height:.9;font-weight:500}
+.score .big small{font-size:30px;color:#8b94a9}
+.score .st{color:var(--gold2);letter-spacing:3px;font-size:18px;margin:10px 0 2px}
+.score>p{font-size:13.5px;color:#aab2c3}
+.bars{margin-top:26px;display:grid;gap:13px}
+.bars li{font-size:13px;color:#d5dae4}
+.bars li div{display:flex;justify-content:space-between;margin-bottom:6px}
+.bars i{display:block;height:4px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden}
+.bars i::after{content:'';display:block;height:100%;width:var(--v);background:linear-gradient(90deg,#b0874c,#ecd29c);border-radius:4px;transform-origin:left;transform:scaleX(0);transition:transform 1.6s var(--ease) .3s}
+.score.in .bars i::after{transform:scaleX(1)}
+.awards{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+.awards span{font-size:11px;letter-spacing:.06em;border:1px solid rgba(231,203,146,.35);color:var(--gold2);border-radius:999px;padding:6px 11px;font-weight:600}
+.rev-cards{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.rcard{background:#fff;border-radius:22px;padding:26px 26px 24px;box-shadow:0 30px 60px -40px rgba(16,24,48,.35);display:flex;flex-direction:column}
+.rcard .st{color:var(--gold);letter-spacing:2px;font-size:14px}
+.rcard q{display:block;font-family:var(--serif);font-size:21px;line-height:1.35;margin:12px 0 20px;quotes:none}
+.rcard .who{display:flex;align-items:center;gap:12px;margin-top:auto;font-size:13.5px}
+.rcard .av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:14px;color:#fff;flex:none}
+.rcard .who b{display:block;font-size:14px}
+.rcard .who span{color:var(--muted);font-size:12.5px}
+
+/* location */
+.loc{background:var(--ink);color:#fff}
+.loc-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:30px;align-items:stretch}
+.map{border-radius:24px;overflow:hidden;border:1px solid var(--line);background:#0d1630;min-height:420px;position:relative}
+.map svg{width:100%;height:100%;display:block}
+.pin-pulse{transform-origin:center;transform-box:fill-box;animation:ring 2.4s ease-out infinite}
+@keyframes ring{from{transform:scale(.4);opacity:.9}to{transform:scale(2.6);opacity:0}}
+.loc-card{border-radius:24px;border:1px solid var(--line);background:var(--navy2);padding:34px 32px;display:flex;flex-direction:column}
+.loc-card h3{font-family:var(--serif);font-weight:500;font-size:30px;line-height:1.1}
+.loc-card address{font-style:normal;color:#b3bacb;margin:8px 0 22px}
+.dist{display:grid;gap:0;margin-bottom:26px}
+.dist li{display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--line);font-size:14.5px;color:#d5dae4}
+.dist li b{color:var(--gold2);font-weight:600}
+.contact-l{display:grid;gap:8px;margin-bottom:26px;font-size:14.5px}
+.contact-l a{color:#fff}.contact-l span{color:#8b94a9;display:inline-block;width:64px}
+.loc-card .btn{margin-top:auto}
+
+/* faq */
+.faq-grid{display:grid;grid-template-columns:1fr 1.5fr;gap:clamp(40px,7vw,100px);align-items:start}
+.faq details{border-bottom:1px solid #e3dccf}
+.faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:24px 0;font-family:var(--serif);font-size:24px;font-weight:600;line-height:1.2}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:'';flex:none;width:34px;height:34px;border-radius:50%;border:1px solid #d6cdbd;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Cpath d='M17 11v12M11 17h12' stroke='%231a2132' stroke-width='1.5'/%3E%3C/svg%3E") center no-repeat;transition:transform .4s var(--ease),background-color .3s}
+.faq details[open] summary::after{transform:rotate(45deg);background-color:var(--gold2);border-color:var(--gold2)}
+.faq details p{color:var(--muted);padding:0 50px 26px 0;font-size:15.5px;animation:fade .5s var(--ease)}
+@keyframes fade{from{opacity:0;transform:translateY(-6px)}}
+
+/* booking */
+.booking{background:radial-gradient(ellipse 60% 60% at 85% 10%,rgba(201,164,106,.16),transparent 70%),var(--navy);color:#fff}
+.book-grid{display:grid;grid-template-columns:1fr 1.25fr;gap:clamp(40px,6vw,90px);align-items:start}
+.book-copy p{color:#b3bacb;font-size:16.5px}
+.book-copy .ticks li{color:#d5dae4}
+.book-form{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:26px;padding:34px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.field{display:flex;flex-direction:column;gap:7px;margin-bottom:0}
+.field label{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8d96ab;font-weight:700}
+.field input,.field select,.field textarea{height:52px;border-radius:13px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#fff;padding:0 16px;font:inherit;font-size:15px;color-scheme:dark;transition:border-color .3s,background .3s;width:100%}
+.field textarea{height:88px;padding:13px 16px;resize:vertical}
+.field select option{background:#131d34}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--gold2);background:rgba(255,255,255,.08)}
+.field.err input,.field.err select{border-color:#ff8a8a}
+.field .msg{display:none;font-size:12px;color:#ff9c9c}
+.field.err .msg{display:block}
+.extras{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:6px 0 16px}
+.chk{position:relative;display:block;cursor:pointer}
+.chk input{position:absolute;opacity:0}
+.chk span{display:block;height:100%;border:1px solid rgba(255,255,255,.14);border-radius:13px;padding:12px 14px;font-size:13px;line-height:1.35;color:#d5dae4;transition:.3s}
+.chk span b{display:block;color:var(--gold2);font-size:12.5px;margin-top:3px}
+.chk input:checked+span{border-color:var(--gold2);background:rgba(201,164,106,.14)}
+.chk input:focus-visible+span{outline:2px solid var(--gold2)}
+.summary{margin:20px 0;border-radius:16px;background:rgba(8,13,26,.55);padding:18px 20px;font-size:14px;color:#c4cad7}
+.sum-row{display:flex;justify-content:space-between;gap:16px;padding:4px 0}
+.sum-total{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--line);margin-top:10px;padding-top:12px;color:#fff;font-weight:600}
+.sum-total b{font-family:var(--serif);font-size:34px;color:var(--gold2);font-weight:600}
+.form-note{font-size:12.5px;color:#8b94a9;margin-top:12px;text-align:center}
+.modal{position:fixed;inset:0;z-index:95;background:rgba(5,8,16,.75);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;transition:.35s}
+.modal.open{opacity:1;visibility:visible}
+.modal-card{background:var(--paper);border-radius:26px;padding:40px 36px 34px;max-width:440px;text-align:center;transform:translateY(20px) scale(.97);transition:transform .5s var(--ease)}
+.modal.open .modal-card{transform:none}
+.modal-card .ok{width:66px;height:66px;margin:0 auto 18px;border-radius:50%;background:linear-gradient(135deg,#ecd29c,#c9a46a);display:grid;place-items:center}
+.modal-card h3{font-family:var(--serif);font-size:34px;font-weight:600;line-height:1.1}
+.modal-card p{color:var(--muted);margin:10px 0 0;font-size:15px}
+.modal-card .det{margin-top:14px;font-weight:600;color:var(--text)}
+.modal-card .demo{font-size:12.5px;background:var(--ivory);border-radius:12px;padding:10px 14px;margin:18px 0 22px}
+
+/* footer */
+.footer{background:#05080f;color:#aab2c3;padding:80px 0 34px;font-size:14.5px}
+.foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:40px;padding-bottom:50px;border-bottom:1px solid var(--line)}
+.footer .logo{margin-bottom:18px}
+.footer h4{color:#fff;font-size:12px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:16px}
+.footer ul{display:grid;gap:9px}
+.footer a:hover{color:var(--gold2)}
+.foot-bottom{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;padding-top:26px;font-size:12.5px;color:#7c8498}
+.foot-bottom b{color:var(--gold2);font-weight:600}
+
+/* elevator indicator + mobile bar */
+.elev{position:fixed;right:22px;top:50%;z-index:40;transform:translate(10px,-50%);opacity:0;visibility:hidden;transition:.45s var(--ease);background:rgba(8,13,26,.88);backdrop-filter:blur(10px);border:1px solid rgba(231,203,146,.38);border-radius:40px;padding:14px 8px 12px;width:70px;text-align:center;color:#fff;box-shadow:0 20px 40px rgba(0,0,0,.3)}
+.elev.show{opacity:1;visibility:visible;transform:translate(0,-50%)}
+.elev .arrow{display:block;color:var(--gold2);font-size:10px;height:14px;opacity:.5;transition:opacity .3s}
+.elev.moving .arrow{opacity:1;animation:bob .5s ease-in-out infinite alternate}
+@keyframes bob{to{transform:translateY(-2px)}}
+.elev .n{display:block;font-family:var(--serif);font-weight:600;font-size:32px;line-height:1;margin:4px 0 5px;font-variant-numeric:tabular-nums}
+.elev small{display:block;font-size:8.5px;letter-spacing:.2em;color:#9aa3b8;font-weight:700}
+.elev .lbl{position:absolute;right:calc(100% + 12px);top:50%;transform:translateY(-50%);white-space:nowrap;font-size:12px;background:rgba(8,13,26,.88);border:1px solid var(--line);padding:6px 12px;border-radius:999px;opacity:0;transition:.3s;pointer-events:none}
+.elev:hover .lbl,.elev.moving .lbl{opacity:1}
+.mbar{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:45;display:none;align-items:center;justify-content:space-between;gap:12px;padding:8px 8px 8px 20px;border-radius:999px;background:rgba(8,13,26,.93);backdrop-filter:blur(12px);color:#fff;box-shadow:0 16px 40px rgba(0,0,0,.35);border:1px solid rgba(231,203,146,.25);transform:translateY(150%);transition:transform .5s var(--ease)}
+.mbar.show{transform:none}
+.mbar span{font-size:12px;color:#aab2c3;line-height:1.2}
+.mbar span b{display:block;color:#fff;font-size:16px;font-family:var(--serif)}
+
+/* responsive */
+@media (max-width:1100px){
+  .links{display:none}.burger{display:block}
+  .nav-cta .btn{display:none}
+  .rooms{grid-template-columns:1fr 1fr}
+  .rooms .room:last-child{grid-column:span 2}
+  .rooms .room:last-child .room-img{aspect-ratio:21/9}
+  .spa-grid{grid-template-columns:1fr 1fr}
+  .spa-info{grid-column:span 2}
+  .rev-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:860px){
+  .hero-grid{grid-template-columns:auto minmax(0,1fr);grid-template-areas:"text text" "tower panel";column-gap:16px;min-height:0;padding-top:40px}
+  .hero-text{padding-bottom:30px}
+  .moon{display:none}
+  .eyebrow{font-size:11px;letter-spacing:.18em;gap:10px}.eyebrow::before{width:22px}
+  .hero p.lead{font-size:16px}
+  .tower-col{padding-left:0}
+  .tower-wrap{height:min(500px,118vw)}
+  .panel{align-self:end;padding-bottom:26px}
+  .fgrid{grid-template-columns:1fr;gap:6px}
+  .fbtn{padding:5px 10px 5px 5px;gap:9px}
+  .fbtn .num{width:32px;height:32px;font-size:14.5px}
+  .fbtn .nm{font-size:12.5px}
+  .fbtn .nm small{font-size:10.5px}
+  .panel-title{font-size:10px;letter-spacing:.18em}
+  .tower-hint{left:4px;top:auto;bottom:calc(100% + 6px)}
+  .h-desk{display:none}.h-touch{display:inline}
+  .tip{width:200px;padding:11px 14px 12px}
+  .t-name{font-size:21px}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .stat:nth-child(3){border-left:0}
+  .stat:nth-child(n+3){border-top:1px solid var(--line)}
+  .stat{padding:24px 8px}.stat b{font-size:38px}
+  .split,.faq-grid,.book-grid,.loc-grid{grid-template-columns:1fr}
+  .split.rev .media{order:0}
+  .media{margin-right:7%}
+  .split.rev .media{margin:0 0 0 7%}
+  .media>img:first-child{aspect-ratio:4/3.6}
+  .rooms,.drinks{grid-template-columns:1fr}
+  .rooms .room:last-child{grid-column:auto}
+  .rooms .room:last-child .room-img{aspect-ratio:4/3}
+  .spa-hero{aspect-ratio:4/3.4;border-radius:22px}
+  .spa-cap{left:20px;bottom:18px;gap:22px}.spa-cap b{font-size:32px}
+  .spa-grid{grid-template-columns:1fr}.spa-info{grid-column:auto}
+  .drinks{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;margin:0 -24px;padding:0 24px 6px;scrollbar-width:none}
+  .drinks::-webkit-scrollbar{display:none}
+  .drink{flex:0 0 80%;scroll-snap-align:center}
+  .sky-info{padding:22px}
+  .sky-info ul{gap:18px 26px}
+  .gallery{columns:2;column-gap:10px}.g-item{margin-bottom:10px;border-radius:12px}
+  .rev-cards{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -24px;padding:0 24px 6px;scrollbar-width:none}
+  .rev-cards::-webkit-scrollbar{display:none}
+  .rcard{flex:0 0 84%;scroll-snap-align:center}
+  .map{min-height:320px}
+  .book-form{padding:22px 18px}
+  .extras{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr;gap:30px}
+  .foot-grid>div:first-child{grid-column:span 2}
+  .elev{display:none}
+  .mbar{display:flex}
+  .footer{padding-bottom:110px}
+  .lightbox{padding:60px 12px}
+  .lb-prev,.lb-next{top:auto;bottom:14px;margin:0}
+  .lb-cap{bottom:30px}
+}
+@media (max-width:420px){
+  .container{width:calc(100% - 36px)}
+  .frow{grid-template-columns:1fr}
+  .hero h1{font-size:50px}
+  .hero-ctas .btn{flex:1;padding:0 16px}
+  .drinks,.rev-cards{margin:0 -18px;padding:0 18px 6px}
+  .faq summary{font-size:21px}
+  .faq details p{padding-right:0}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="demo-bar">Example website — fictional business, made by <b>Kiril Web Design</b></div>
+
+<header class="header">
+  <nav class="nav container" aria-label="Main">
+    <a href="#top" class="logo" aria-label="Altura Sky Hotel — home">
+      <svg width="22" height="30" viewBox="0 0 24 32" aria-hidden="true"><path d="M12 0v5M8.5 5h7l2.5 5v22H6V10z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 14h4M10 18h4M10 22h4M10 26h4" stroke="currentColor" stroke-width="1.2"/></svg>
+      <span><b>ALTURA</b><small>SKY HOTEL · HARBOR CITY</small></span>
+    </a>
+    <div class="links">
+      <a href="#top">Floors</a><a href="#rooms">Rooms</a><a href="#restaurant">Dining</a><a href="#spa">Spa</a><a href="#skybar">Sky Bar</a><a href="#gallery">Gallery</a><a href="#location">Location</a>
+    </div>
+    <div class="nav-cta">
+      <a href="#booking" class="btn btn-gold btn-sm">Book now</a>
+      <button class="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button>
+    </div>
+  </nav>
+</header>
+<div class="mnav" aria-label="Mobile">
+  <a href="#top">Floors</a><a href="#rooms">Rooms</a><a href="#restaurant">Dining</a><a href="#spa">Spa &amp; Pool</a><a href="#skybar">Sky Bar</a><a href="#gallery">Gallery</a><a href="#location">Location</a>
+  <a href="#booking" class="btn btn-gold">Book your stay</a>
+</div>
+
+<main>
+<section class="hero" id="top" data-nofloor>
+  <div class="stars"></div>
+  <div class="moon"></div>
+  <svg class="city-bg" id="cityBg" preserveAspectRatio="xMidYMax slice" viewBox="0 0 1600 300" aria-hidden="true"></svg>
+  <div class="hero-grid container">
+    <div class="hero-text">
+      <span class="eyebrow">Harbor City · 814 ft above the bay</span>
+      <h1>Stay above<br><em>it all.</em></h1>
+      <p class="lead">Sixty floors of quiet luxury — every level its own world, from candle-lit dinners on Floor 3 to cocktails among the clouds on Floor 60.</p>
+      <div class="hero-ctas">
+        <a href="#booking" class="btn btn-gold">Book your stay <span class="arr">→</span></a>
+        <a href="#rooms" class="btn btn-ghost">View rooms</a>
+      </div>
+      <div class="rating"><span class="st">★★★★★</span><span><b>4.9</b> · 2,184 guest reviews</span></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Floor directory</div>
+      <div class="fgrid" id="fgrid"></div>
+    </div>
+    <div class="tower-col">
+      <div class="tower-wrap">
+        <svg id="tower" class="tower boot" viewBox="0 0 420 1000" role="group" aria-label="Interactive hotel tower. Choose a floor."></svg>
+        <div class="tower-hint"><span class="dot"></span><span class="h-desk">Hover a floor · click to visit</span><span class="h-touch">Tap a floor · tap again to visit</span></div>
+        <div class="tip" aria-hidden="true"><div class="t-floor"></div><div class="t-name"></div><div class="t-meta"></div><div class="t-cta"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="stats" data-nofloor>
+  <div class="container stats-grid">
+    <div class="stat"><b>60</b><span>Floors</span></div>
+    <div class="stat"><b>814 ft</b><span>Above the bay</span></div>
+    <div class="stat"><b>212</b><span>Rooms &amp; suites</span></div>
+    <div class="stat"><b>4.9★</b><span>Guest rating</span></div>
+  </div>
+</div>
+
+<!-- FLOOR 1 · LOBBY -->
+<section id="lobby" class="sec sec-light" data-floor="1" data-fname="Grand Lobby">
+  <div class="container split">
+    <div class="media reveal">
+      <img src="images/lobby.webp" alt="Grand lobby with warm walnut walls and lounge seating" loading="lazy">
+      <img class="media-sub" src="images/lobby-lounge.webp" alt="Lobby lounge" loading="lazy">
+    </div>
+    <div class="copy reveal" style="--i:1">
+      <span class="floor-tag"><i>L</i>Floor 1 · Grand Lobby</span>
+      <h2>An arrival that <em>slows time.</em></h2>
+      <p>Thirty-six-foot ceilings, warm walnut and stone, and a concierge team that remembers your name. Check in at the desk — or straight from the limousine.</p>
+      <ul class="ticks">
+        <li>24/7 concierge &amp; express check-in</li>
+        <li>Check-in from 2 PM · check-out until noon</li>
+        <li>Valet parking &amp; EV charging</li>
+        <li>Airport limousine on request</li>
+      </ul>
+      <a href="#booking" class="btn btn-dark">Book your stay <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ROOMS -->
+<section id="rooms" class="sec sec-ivory">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="floor-tag"><i>15+</i>Floors 15–59 · Rooms &amp; Suites</span>
+      <h2>Rooms that rise <em>with you.</em></h2>
+      <p class="lead2">The higher you sleep, the wider the view. Every room has floor-to-ceiling windows, blackout drapes and a bed you'll want to take home.</p>
+    </div>
+    <div class="rooms">
+      <article id="standard" class="room reveal" data-floor="15" data-fname="Standard Rooms">
+        <div class="room-img"><img src="images/room-standard.webp" alt="Standard room with king bed and city view" loading="lazy"><span class="badge">Floors 15–29</span></div>
+        <div class="room-body">
+          <div class="room-top"><h3>Standard City</h3><div class="price"><b>$189</b><span>/ night</span></div></div>
+          <p>Calm, light and clever — a king or twin beds facing the harbor skyline.</p>
+          <ul class="specs"><li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="12" height="12" rx="1"/></svg>380 sq ft</li><li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="5" r="2.6"/><path d="M3 14c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5"/></svg>2 guests</li><li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2"/></svg>City view</li></ul>
+          <ul class="amen"><li>Rain shower</li><li>Nespresso</li><li>65" Smart TV</li><li>Fast Wi-Fi</li></ul>
+          <a href="#booking" class="btn btn-line btn-block" data-book="standard">Book Standard</a>
+        </div>
+      </article>
+      <article id="deluxe" class="room reveal" style="--i:1" data-floor="30" data-fname="Deluxe Rooms">
+        <div class="room-img"><img src="images/room-deluxe.webp" alt="Deluxe room with panoramic windows" loading="lazy"><span class="badge">Floors 30–45</span></div>
+        <div class="room-body">
+          <div class="room-top"><h3>Deluxe Skyline</h3><div class="price"><b>$279</b><span>/ night</span></div></div>
+          <p>Corner windows, a deep soaking tub and the whole city laid out at your feet.</p>
+          <ul class="specs"><li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="12" height="12" rx="1"/></svg>520 sq ft</li><li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="5" r="2.6"/><path d="M3 14c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5"/></svg>3 guests</li><li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2"/></svg>Panorama</li></ul>
+          <ul class="amen"><li>Soaking tub</li><li>Curated minibar</li><li>Bose sound</li><li>Robes &amp; slippers</li></ul>
+          <a href="#booking" class="btn btn-line btn-block" data-book="deluxe">Book Deluxe</a>
+        </div>
+      </article>
+      <article id="suite" class="room featured reveal" style="--i:2" data-floor="46" data-fname="Signature Suites">
+        <div class="room-img"><img src="images/room-suite.webp" alt="Signature suite with glass walls and living area" loading="lazy"><span class="badge">Floors 46–59</span><span class="ribbon">Most booked</span></div>
+        <div class="room-body">
+          <div class="room-top"><h3>Signature Suite</h3><div class="price"><b>$549</b><span>/ night</span></div></div>
+          <p>A private residence in the sky — separate living room, 270° views and a butler on call.</p>
+          <ul class="specs"><li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="12" height="12" rx="1"/></svg>1,150 sq ft</li><li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="5" r="2.6"/><path d="M3 14c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5"/></svg>4 guests</li><li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2"/></svg>270° view</li></ul>
+          <ul class="amen"><li>Butler service</li><li>Freestanding tub</li><li>Living room</li><li>Sky Bar priority</li></ul>
+          <a href="#booking" class="btn btn-gold btn-block" data-book="suite">Book the Suite <span class="arr">→</span></a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- FLOOR 3 · RESTAURANT -->
+<section id="restaurant" class="sec sec-dark" data-floor="3" data-fname="Atelier Restaurant">
+  <div class="container split rev">
+    <div class="media reveal">
+      <img src="images/restaurant.webp" alt="Atelier restaurant dining room with tall windows" loading="lazy">
+      <img class="media-sub" src="images/dish.webp" alt="Plated dish from the tasting menu" loading="lazy">
+    </div>
+    <div class="copy reveal" style="--i:1">
+      <span class="floor-tag"><i>03</i>Floor 3 · Atelier Restaurant</span>
+      <h2>Seasonal plates, <em>open fire.</em></h2>
+      <p>Chef Lena Marquez cooks modern European food over oak embers — local fish, aged beef and a wine list that travels the world.</p>
+      <ul class="menu">
+        <li><span>Seven-course tasting menu<small>Changes with the season</small></span><i></i><b>$95</b></li>
+        <li><span>Lobster tagliolini<small>Saffron, chili, lemon butter</small></span><i></i><b>$42</b></li>
+        <li><span>45-day dry-aged ribeye<small>Smoked bone marrow jus</small></span><i></i><b>$58</b></li>
+        <li><span>Sommelier wine pairing<small>Five glasses</small></span><i></i><b>$65</b></li>
+      </ul>
+      <div class="hours"><div><b>Lunch</b>12 – 3 PM daily</div><div><b>Dinner</b>6 – 11 PM daily</div><div><b>Dress</b>Smart casual</div></div>
+      <a href="#booking" class="btn btn-gold" data-book="dinner">Reserve a table <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- FLOOR 12 · SPA -->
+<section id="spa" class="sec sec-light" data-floor="12" data-fname="Spa &amp; Infinity Pool">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="floor-tag"><i>12</i>Floor 12 · Spa &amp; Infinity Pool</span>
+      <h2>Swim at the <em>edge of the sky.</em></h2>
+      <p class="lead2">A heated glass-edged pool cantilevered over the city, a hammam, saunas and treatment rooms that face the sunrise.</p>
+    </div>
+    <div class="spa-hero reveal">
+      <img src="images/pool.webp" alt="Rooftop infinity pool overlooking the city" loading="lazy">
+      <div class="spa-cap"><div><b>82 ft</b><span>Heated infinity pool</span></div><div><b>7–10</b><span>Open daily, AM to PM</span></div><div><b>Free</b><span>For hotel guests</span></div></div>
+    </div>
+    <div class="spa-grid">
+      <div class="treat reveal"><img src="images/spa-massage.webp" alt="Massage with warm aromatic oils" loading="lazy"><div><div><h3>Skyline Signature Massage</h3><p>90 min · warm oils · city views</p></div><b>$180</b></div></div>
+      <div class="treat reveal" style="--i:1"><img src="images/spa-stones.webp" alt="Hot stone treatment" loading="lazy"><div><div><h3>Hot Stone Ritual</h3><p>75 min · basalt stones · scalp massage</p></div><b>$160</b></div></div>
+      <div class="spa-info reveal" style="--i:2">
+        <h3>Included with every stay</h3>
+        <ul class="ticks">
+          <li>Infinity pool &amp; jacuzzi</li>
+          <li>Finnish sauna, steam room &amp; hammam</li>
+          <li>24/7 fitness studio with trainers</li>
+          <li>Robes, towels &amp; herbal tea bar</li>
+        </ul>
+        <a href="#booking" class="btn btn-gold" data-book="spa">Book a treatment <span class="arr">→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FLOORS 6–8 · CONFERENCE -->
+<section id="conference" class="sec sec-ivory" data-floor="6" data-fname="The Forum">
+  <div class="container split">
+    <div class="media reveal">
+      <img src="images/conf.webp" alt="Boardroom with floor-to-ceiling windows" loading="lazy">
+      <img class="media-sub" src="images/conf2.webp" alt="Meeting room with city view" loading="lazy" style="border-color:var(--ivory)">
+    </div>
+    <div class="copy reveal" style="--i:1">
+      <span class="floor-tag"><i>06</i>Floors 6–8 · The Forum</span>
+      <h2>Meetings with a <em>view of the deal.</em></h2>
+      <p>Three floors of daylight-filled event space with hybrid streaming, a dedicated event manager and catering by Atelier.</p>
+      <ul class="venues">
+        <li><b>Forum Hall</b><em>280 guests</em><span>Theater · gala dinners · launches</span></li>
+        <li><b>Skyline Studio</b><em>60 guests</em><span>Workshops · cocktail receptions</span></li>
+        <li><b>The Board Room</b><em>16 guests</em><span>Executive meetings · 86" screen</span></li>
+      </ul>
+      <a href="#location" class="btn btn-dark">Request a proposal <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- FLOOR 60 · SKY BAR -->
+<section id="skybar" class="sec skybar" data-floor="60" data-fname="Cloud 60 Sky Bar">
+  <div class="skybar-bg"></div>
+  <div class="container">
+    <div class="sec-head center reveal">
+      <span class="floor-tag"><i>60</i>Rooftop · Cloud 60 Sky Bar</span>
+      <h2>Cocktails <em>among the clouds.</em></h2>
+      <p class="lead2">814 feet up, the city turns into a sea of light. Signature cocktails, rare champagne and a DJ who knows when to keep it low.</p>
+    </div>
+    <div class="drinks">
+      <div class="drink reveal"><img src="images/cocktail-1.webp" alt="Purple cocktail being poured at the bar" loading="lazy"><div><div><h3>Violet Horizon</h3><p>Gin, butterfly pea, yuzu</p></div><b>$19</b></div></div>
+      <div class="drink reveal" style="--i:1"><img src="images/cocktail-2.webp" alt="Blackberry sour with dried citrus" loading="lazy"><div><div><h3>Smoked Bramble</h3><p>Bourbon, blackberry, oak smoke</p></div><b>$21</b></div></div>
+      <div class="drink reveal" style="--i:2"><img src="images/bar.webp" alt="Glowing bar counter at night" loading="lazy"><div><div><h3>Golden Hour Flute</h3><p>Grand cru champagne by the glass</p></div><b>$26</b></div></div>
+    </div>
+    <div class="sky-info reveal">
+      <ul><li><b>5 PM – 2 AM</b>Open daily</li><li><b>Fri &amp; Sat</b>Live DJ from 9 PM</li><li><b>Sunset</b>Window tables bookable</li></ul>
+      <a href="#booking" class="btn btn-gold">Reserve a sunset table <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery" class="sec sec-light" data-nofloor>
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="floor-tag"><i>◇</i>Gallery</span>
+      <h2>A closer look at <em>Altura.</em></h2>
+    </div>
+    <div class="gallery reveal">
+      <button class="g-item tall"><img src="images/tower.webp" alt="The tower rising into the clouds" loading="lazy"></button>
+      <button class="g-item"><img src="images/pool.webp" alt="Infinity pool on Floor 12" loading="lazy"></button>
+      <button class="g-item sq"><img src="images/bar.webp" alt="Cloud 60 Sky Bar at night" loading="lazy"></button>
+      <button class="g-item"><img src="images/window.webp" alt="Morning light in a Deluxe room" loading="lazy"></button>
+      <button class="g-item tall"><img src="images/hallway.webp" alt="Guest corridor" loading="lazy"></button>
+      <button class="g-item"><img src="images/bath.webp" alt="Suite bathroom with rain shower" loading="lazy"></button>
+      <button class="g-item sq"><img src="images/dish.webp" alt="Tasting menu at Atelier" loading="lazy"></button>
+      <button class="g-item"><img src="images/lobby-lounge.webp" alt="Lobby lounge" loading="lazy"></button>
+      <button class="g-item tall"><img src="images/city.webp" alt="Harbor City at sunrise" loading="lazy"></button>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section id="reviews" class="sec sec-ivory" data-nofloor>
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="floor-tag"><i>★</i>Guest reviews</span>
+      <h2>Loved from the <em>ground up.</em></h2>
+    </div>
+    <div class="rev-grid">
+      <div class="score reveal">
+        <div class="big">4.9<small> / 5</small></div>
+        <div class="st">★★★★★</div>
+        <p>Exceptional · based on 2,184 reviews</p>
+        <ul class="bars">
+          <li><div><span>Views</span><b>10.0</b></div><i style="--v:100%"></i></li>
+          <li><div><span>Service</span><b>9.8</b></div><i style="--v:98%"></i></li>
+          <li><div><span>Location</span><b>9.7</b></div><i style="--v:97%"></i></li>
+          <li><div><span>Rooms</span><b>9.6</b></div><i style="--v:96%"></i></li>
+          <li><div><span>Value</span><b>9.1</b></div><i style="--v:91%"></i></li>
+        </ul>
+        <div class="awards"><span>Best Rooftop Bar 2026</span><span>Travelers' Choice</span></div>
+      </div>
+      <div class="rev-cards">
+        <div class="rcard reveal"><div class="st">★★★★★</div><q>We booked the Suite for our anniversary. Waking up above the clouds felt unreal — and the butler remembered how we take our coffee.</q><div class="who"><span class="av" style="background:#9c7638">SL</span><div><b>Sophie L.</b><span>London · Signature Suite</span></div></div></div>
+        <div class="rcard reveal" style="--i:1"><div class="st">★★★★★</div><q>The infinity pool on the 12th floor is worth the trip alone. Spotless spa, quiet at 7 AM, perfect before meetings.</q><div class="who"><span class="av" style="background:#2c4a7a">DM</span><div><b>Daniel M.</b><span>Toronto · Deluxe Skyline</span></div></div></div>
+        <div class="rcard reveal" style="--i:2"><div class="st">★★★★★</div><q>Cloud 60 at sunset is the best bar I've been to in years. Book a window table — trust me.</q><div class="who"><span class="av" style="background:#6a4c8c">AT</span><div><b>Aiko T.</b><span>Osaka · Standard City</span></div></div></div>
+        <div class="rcard reveal" style="--i:3"><div class="st">★★★★★</div><q>Ran a 120-person summit in the Forum Hall. Flawless tech, great food, and everyone stayed for drinks upstairs.</q><div class="who"><span class="av" style="background:#3c6b5a">MR</span><div><b>Marco R.</b><span>Milan · Event organizer</span></div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOCATION -->
+<section id="location" class="sec loc" data-nofloor>
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="floor-tag" style="color:var(--gold2)"><i>⌖</i>Location</span>
+      <h2>In the heart of <em>Harbor City.</em></h2>
+    </div>
+    <div class="loc-grid">
+      <div class="map reveal" aria-label="Stylized map of Harbor City">
+        <svg viewBox="0 0 640 440" preserveAspectRatio="xMidYMid slice">
+          <rect width="640" height="440" fill="#0d1630"/>
+          <path d="M640 250 C560 260 520 300 470 330 C420 360 380 440 380 440 H640Z" fill="#10284d"/>
+          <path d="M0 120 C90 130 150 100 230 120 C300 140 340 200 420 230 C470 248 560 245 640 240" fill="none" stroke="#123058" stroke-width="22"/>
+          <g fill="#132b26"><rect x="60" y="250" width="110" height="70" rx="10"/><rect x="470" y="60" width="90" height="80" rx="10"/></g>
+          <g stroke="#17213d" stroke-width="2">
+            <path d="M0 60H640M0 190H640M0 300H640M0 380H640M80 0V440M200 0V440M330 0V440M450 0V440M560 0V440"/>
+          </g>
+          <g stroke="#26355a" stroke-width="5" fill="none" stroke-linecap="round"><path d="M0 330 L320 230 L640 170"/><path d="M300 0 V440"/></g>
+          <g fill="#5b6787" font-family="Manrope,sans-serif" font-size="12" font-weight="600" letter-spacing="1.5">
+            <text x="96" y="290">MERIDIAN PARK</text><text x="478" y="105">OLD TOWN</text><text x="520" y="350">HARBOR</text><text x="40" y="104">RIVER WALK</text>
+          </g>
+          <g font-family="Manrope,sans-serif" font-size="11.5" fill="#cdd3df">
+            <circle cx="200" cy="190" r="5" fill="#7f92ba"/><text x="210" y="186">Central Station · 5 min</text>
+            <circle cx="515" cy="100" r="5" fill="#7f92ba"/><text x="455" y="160">Old Town · 8 min</text>
+            <circle cx="470" cy="300" r="5" fill="#7f92ba"/><text x="370" y="318">Promenade · 2 min</text>
+            <text x="512" y="420" fill="#e7cb92">✈ Airport 25 min →</text>
+          </g>
+          <circle cx="330" cy="228" r="16" fill="#e7cb92" opacity=".5" class="pin-pulse"/>
+          <circle cx="330" cy="228" r="16" fill="#e7cb92" opacity=".5" class="pin-pulse" style="animation-delay:1.2s"/>
+          <circle cx="330" cy="228" r="9" fill="#e7cb92" stroke="#080d1a" stroke-width="3"/>
+          <g><rect x="250" y="168" width="160" height="38" rx="19" fill="#080d1a" stroke="#e7cb92" stroke-opacity=".6"/><text x="330" y="192" text-anchor="middle" fill="#fff" font-family="Cormorant,serif" font-size="18" font-weight="600" letter-spacing="3">ALTURA</text></g>
+        </svg>
+      </div>
+      <div class="loc-card reveal" style="--i:1">
+        <h3>Altura Sky Hotel</h3>
+        <address>1 Meridian Plaza, Harbor City</address>
+        <ul class="dist">
+          <li>Harbor Promenade<b>2 min walk</b></li>
+          <li>Central Station<b>5 min walk</b></li>
+          <li>Old Town &amp; museums<b>8 min drive</b></li>
+          <li>International Airport<b>25 min drive</b></li>
+        </ul>
+        <div class="contact-l">
+          <div><span>Phone</span><a href="tel:+15550600060">+1 (555) 060-0060</a></div>
+          <div><span>Email</span><a href="mailto:stay@altura-hotel.example">stay@altura-hotel.example</a></div>
+          <div><span>Events</span><a href="mailto:events@altura-hotel.example">events@altura-hotel.example</a></div>
+        </div>
+        <a href="tel:+15550600060" class="btn btn-gold">Call the concierge <span class="arr">→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="sec sec-light" data-nofloor>
+  <div class="container faq-grid">
+    <div class="sec-head reveal" style="margin-bottom:0">
+      <span class="floor-tag"><i>?</i>FAQ</span>
+      <h2>Good to <em>know.</em></h2>
+      <p class="lead2">Can't find your answer? Our concierge replies within minutes, day or night.</p>
+    </div>
+    <div class="faq reveal" style="--i:1">
+      <details open><summary>What are check-in and check-out times?</summary><p>Check-in is from 2 PM and check-out is until noon. Early check-in and late check-out are free for Suite guests and on request for everyone else.</p></details>
+      <details><summary>Is the pool and spa included?</summary><p>Yes. The infinity pool, saunas, hammam and fitness studio on Floor 12 are free for all hotel guests. Treatments are booked separately.</p></details>
+      <details><summary>Can I visit the Sky Bar without staying?</summary><p>Absolutely. Cloud 60 is open to the public from 5 PM. Hotel guests get priority seating and can reserve sunset window tables.</p></details>
+      <details><summary>Do you offer parking and airport transfer?</summary><p>Valet parking is $45 per night with EV charging. Our limousine to the airport takes about 25 minutes and costs $65 one way.</p></details>
+      <details><summary>What is the cancellation policy?</summary><p>Free cancellation up to 48 hours before arrival on all direct bookings. After that, the first night is charged.</p></details>
+      <details><summary>Are pets and children welcome?</summary><p>Kids under 12 stay free in their parents' room, with cribs on request. Small dogs are welcome on Floors 15–29 for $40 per stay.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- BOOKING -->
+<section id="booking" class="sec booking" data-nofloor>
+  <div class="container book-grid">
+    <div class="book-copy reveal">
+      <span class="floor-tag"><i>✦</i>Reservations</span>
+      <h2>Choose your <em>floor.</em></h2>
+      <p>Book direct for the best rate — and a glass of champagne waiting for you on Floor 60.</p>
+      <ul class="ticks">
+        <li>Best-rate guarantee on direct bookings</li>
+        <li>Free cancellation up to 48 hours before arrival</li>
+        <li>Pay at the hotel — no deposit today</li>
+        <li>Welcome drink at Cloud 60 Sky Bar</li>
+      </ul>
+    </div>
+    <form class="book-form reveal" id="bookForm" novalidate style="--i:1">
+      <div class="frow">
+        <div class="field"><label for="checkin">Check-in</label><input type="date" id="checkin" name="checkin" required><span class="msg">Choose a date</span></div>
+        <div class="field"><label for="checkout">Check-out</label><input type="date" id="checkout" name="checkout" required><span class="msg">Must be after check-in</span></div>
+      </div>
+      <div class="frow">
+        <div class="field"><label for="guests">Guests</label><select id="guests" name="guests"><option value="1">1 guest</option><option value="2" selected>2 guests</option><option value="3">3 guests</option><option value="4">4 guests</option></select></div>
+        <div class="field"><label for="room">Room</label><select id="room" name="room"><option value="standard">Standard City — $189</option><option value="deluxe" selected>Deluxe Skyline — $279</option><option value="suite">Signature Suite — $549</option></select></div>
+      </div>
+      <div class="field" style="margin-bottom:8px"><label>Add to your stay</label></div>
+      <div class="extras">
+        <label class="chk"><input type="checkbox" name="dinner"><span>Atelier tasting dinner<b>$95 / guest</b></span></label>
+        <label class="chk"><input type="checkbox" name="spa"><span>Signature massage<b>$180</b></span></label>
+        <label class="chk"><input type="checkbox" name="transfer"><span>Airport limousine<b>$65</b></span></label>
+      </div>
+      <div class="frow">
+        <div class="field"><label for="fullname">Full name</label><input id="fullname" name="fullname" autocomplete="name" placeholder="Jane Carter" required><span class="msg">Please enter your name</span></div>
+        <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" placeholder="jane@email.com" required><span class="msg">Please enter a valid email</span></div>
+      </div>
+      <div class="field"><label for="notes">Special requests</label><textarea id="notes" name="notes" placeholder="High floor, anniversary, late arrival…"></textarea></div>
+      <div class="summary" aria-live="polite">
+        <div class="sum-row"><span id="sumRoom"></span><span id="sumBase"></span></div>
+        <div id="sumExtras"></div>
+        <div class="sum-total"><span>Total · taxes included</span><b id="sumTotal"></b></div>
+      </div>
+      <button class="btn btn-gold btn-block" type="submit">Request booking <span class="arr">→</span></button>
+      <p class="form-note">Demo form — no booking is made and no payment is taken.</p>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="foot-grid">
+      <div>
+        <a href="#top" class="logo"><svg width="22" height="30" viewBox="0 0 24 32" aria-hidden="true"><path d="M12 0v5M8.5 5h7l2.5 5v22H6V10z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 14h4M10 18h4M10 22h4M10 26h4" stroke="currentColor" stroke-width="1.2"/></svg><span><b>ALTURA</b><small>SKY HOTEL · HARBOR CITY</small></span></a>
+        <p style="max-width:330px">Sixty floors above Harbor City. Rooms, dining, spa and the city's highest bar — all under one sky.</p>
+      </div>
+      <div><h4>Explore</h4><ul><li><a href="#rooms">Rooms &amp; Suites</a></li><li><a href="#restaurant">Atelier Restaurant</a></li><li><a href="#spa">Spa &amp; Pool</a></li><li><a href="#skybar">Cloud 60 Sky Bar</a></li><li><a href="#conference">Meetings &amp; Events</a></li></ul></div>
+      <div><h4>Visit</h4><ul><li>1 Meridian Plaza</li><li>Harbor City</li><li><a href="tel:+15550600060">+1 (555) 060-0060</a></li><li><a href="mailto:stay@altura-hotel.example">stay@altura-hotel.example</a></li></ul></div>
+      <div><h4>Follow</h4><ul><li><a href="#top">Instagram</a></li><li><a href="#top">Facebook</a></li><li><a href="#top">TikTok</a></li></ul></div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Altura Sky Hotel — a fictional business. Names, prices and reviews are invented. Photos: Unsplash.</span>
+      <span>Website design &amp; development: <b>Kiril Web Design</b></span>
+    </div>
+  </div>
+</footer>
+
+<button class="elev" aria-label="Back to the tower" title="Back to the tower"><span class="arrow">▲</span><span class="n">L</span><small>FLOOR</small><span class="lbl"></span></button>
+<div class="mbar"><span>From<b>$189 / night</b></span><a href="#booking" class="btn btn-gold btn-sm">Book now</a></div>
+
+<div class="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
+  <img alt="">
+  <button class="lb-btn lb-close" aria-label="Close">✕</button>
+  <button class="lb-btn lb-prev" aria-label="Previous">←</button>
+  <button class="lb-btn lb-next" aria-label="Next">→</button>
+  <div class="lb-cap"></div>
+</div>
+<div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="modal-card">
+    <div class="ok"><svg width="30" height="30" viewBox="0 0 20 20"><path d="M5 10.5l3.2 3L15 7" fill="none" stroke="#1a1307" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <h3 id="mTitle">Thank you, <span id="mName"></span>!</h3>
+    <p>Your request has been received. Our reservations team would confirm within the hour.</p>
+    <p class="det" id="mDetails"></p>
+    <div class="demo">This is an example website for a fictional hotel — no booking was made and no payment was taken.</div>
+    <button class="btn btn-dark btn-block" id="mClose">Close</button>
+  </div>
+</div>
+
+<script>
+(() => {
+const $ = (s, c = document) => c.querySelector(s), $$ = (s, c = document) => [...c.querySelectorAll(s)];
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const canHover = matchMedia('(hover: hover) and (pointer: fine)').matches;
+const header = $('.header');
+
+/* header + menu */
+const onScroll = () => header.classList.toggle('scrolled', scrollY > 30);
+addEventListener('scroll', onScroll, {passive: true}); onScroll();
+const burger = $('.burger');
+burger.addEventListener('click', () => { const o = document.body.classList.toggle('nav-open'); burger.setAttribute('aria-expanded', o); });
+$$('.mnav a').forEach(a => a.addEventListener('click', () => document.body.classList.remove('nav-open')));
+
+/* stars */
+const stars = $('.stars');
+for (let i = 0; i < 110; i++) {
+  const s = document.createElement('span'), z = Math.random() < .15 ? 2 : 1;
+  s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*68}%;width:${z}px;height:${z}px;opacity:${.2+Math.random()*.7};animation-delay:${-Math.random()*6}s;animation-duration:${3+Math.random()*5}s`;
+  stars.appendChild(s);
+}
+
+const NS = 'http://www.w3.org/2000/svg';
+const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+const rnd = (a, b) => a + Math.random() * (b - a);
+
+/* background city */
+(function city() {
+  const svg = $('#cityBg');
+  [[ '#0e1733', 130, 250, .5 ], [ '#0a1226', 50, 160, .35 ]].forEach(([fill, minH, maxH, wp]) => {
+    let x = -20;
+    while (x < 1620) {
+      const w = rnd(40, 110), h = rnd(minH, maxH), y = 300 - h;
+      el('rect', {x, y, width: w, height: h, fill}, svg);
+      for (let wy = y + 10; wy < 292; wy += 11) for (let wx = x + 7; wx < x + w - 7; wx += 9)
+        if (Math.random() < wp * .22) el('rect', {x: wx, y: wy, width: 3, height: 4, fill: '#f2cd85', opacity: rnd(.25, .7)}, svg);
+      x += w + rnd(2, 14);
+    }
+  });
+})();
+
+/* floors data */
+const FLOORS = [
+  {id: 'skybar', num: '60', label: 'Floor 60', name: 'Cloud 60 Sky Bar', short: 'Sky Bar', meta: 'Rooftop cocktails · 5 PM – 2 AM', target: '#skybar'},
+  {id: 'suite', num: '46', label: 'Floors 46–59', name: 'Signature Suites', short: 'Suites', meta: 'From $549 / night · 270° views', target: '#suite'},
+  {id: 'deluxe', num: '30', label: 'Floors 30–45', name: 'Deluxe Rooms', short: 'Deluxe', meta: 'From $279 / night · panorama', target: '#deluxe'},
+  {id: 'standard', num: '15', label: 'Floors 15–29', name: 'Standard Rooms', short: 'Standard', meta: 'From $189 / night · city view', target: '#standard'},
+  {id: 'spa', num: '12', label: 'Floor 12', name: 'Spa & Infinity Pool', short: 'Spa & Pool', meta: 'Open daily 7 AM – 10 PM', target: '#spa'},
+  {id: 'conference', num: '6', label: 'Floors 6–8', name: 'The Forum', short: 'Conference', meta: 'Events for up to 280 guests', target: '#conference'},
+  {id: 'restaurant', num: '3', label: 'Floor 3', name: 'Atelier Restaurant', short: 'Restaurant', meta: 'Modern European · open fire', target: '#restaurant'},
+  {id: 'lobby', num: 'L', label: 'Floor 1', name: 'Grand Lobby', short: 'Lobby', meta: 'Concierge & check-in 24/7', target: '#lobby'}
+];
+const byId = id => FLOORS.find(f => f.id === id);
+
+/* floor directory buttons */
+const fgrid = $('#fgrid');
+FLOORS.forEach(f => {
+  const b = document.createElement('button');
+  b.className = 'fbtn'; b.dataset.id = f.id; b.type = 'button';
+  b.innerHTML = `<span class="num">${f.num}</span><span class="nm">${f.short}<small>${f.label}</small></span>`;
+  fgrid.appendChild(b);
+});
+
+/* tower */
+const tower = $('#tower');
+const ZONES = [
+  {id: 'skybar', kind: 'crown'},
+  {id: 'suite', y0: 200, y1: 340, x0: 140, x1: 280, rows: 13},
+  {id: 'deluxe', y0: 340, y1: 496, x0: 128, x1: 292, rows: 15},
+  {id: 'standard', y0: 496, y1: 650, x0: 116, x1: 304, rows: 15},
+  {id: 'spa', kind: 'spa', y0: 650, y1: 716, x0: 116, x1: 304},
+  {id: 'conference', kind: 'office', y0: 716, y1: 822, x0: 84, x1: 336, rows: 6},
+  {id: 'restaurant', kind: 'resto', y0: 822, y1: 888, x0: 84, x1: 336},
+  {id: 'lobby', kind: 'lobby', y0: 888, y1: 960, x0: 84, x1: 336}
+];
+const dl = y => Math.round((960 - y) * 1.5 + Math.random() * 450);
+(function build() {
+  el('defs', {}, tower).innerHTML = `
+    <linearGradient id="glass" x1="0" x2="1"><stop offset="0" stop-color="#24375e"/><stop offset=".2" stop-color="#16243f"/><stop offset=".7" stop-color="#0f1a30"/><stop offset="1" stop-color="#0a1224"/></linearGradient>
+    <linearGradient id="crownG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbe6b4"/><stop offset="1" stop-color="#c0914f" stop-opacity=".75"/></linearGradient>
+    <linearGradient id="water" x1="0" x2="1"><stop offset="0" stop-color="#6fdcf6"/><stop offset="1" stop-color="#2a8fc4"/></linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".42" stop-color="#fff" stop-opacity=".06"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#e7cb92" stop-opacity=".5"/><stop offset="1" stop-color="#e7cb92" stop-opacity="0"/></radialGradient>
+    <linearGradient id="lobbyLight" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe6b0"/><stop offset="1" stop-color="#d89c55"/></linearGradient>`;
+  el('ellipse', {cx: 210, cy: 960, rx: 230, ry: 26, fill: 'url(#glow)', class: 'deco'}, tower);
+  el('ellipse', {cx: 210, cy: 150, rx: 120, ry: 80, fill: 'url(#glow)', class: 'halo deco'}, tower);
+  el('rect', {x: 206, y: 62, width: 8, height: 54, fill: '#1b2a48', class: 'deco'}, tower);
+  el('line', {x1: 210, y1: 12, x2: 210, y2: 64, stroke: '#7f92ba', 'stroke-width': 1.6, class: 'deco'}, tower);
+  el('circle', {cx: 210, cy: 12, r: 8, fill: '#ff5a5a', opacity: .25, class: 'beacon-g deco'}, tower);
+  el('circle', {cx: 210, cy: 12, r: 2.8, fill: '#ff6b6b', class: 'beacon deco'}, tower);
+  const zg = el('g', {class: 'zones'}, tower);
+
+  ZONES.forEach(z => {
+    const f = byId(z.id);
+    const g = el('g', {class: 'zone', 'data-id': z.id, tabindex: 0, role: 'button', 'aria-label': `${f.label} — ${f.name}`}, zg);
+    const wins = el('g', {}, g);
+    let shape;
+    const win = (x, y, w, h, cls, tw) => {
+      const r = el('rect', {x, y, width: w, height: h, class: cls}, wins);
+      if (cls.includes(' l')) {
+        r.setAttribute('fill-opacity', rnd(.6, 1).toFixed(2));
+        let st = `--d:${dl(y)}ms`;
+        if (tw) { r.classList.add('tw'); st += `;--t:${rnd(10, 22).toFixed(1)}s;--td:${(-rnd(0, 20)).toFixed(1)}s`; }
+        r.setAttribute('style', st);
+      }
+    };
+    if (z.kind === 'crown') {
+      const pts = '150,200 270,200 270,152 258,152 236,114 184,114 162,152 150,152';
+      g.insertBefore(el('polygon', {points: pts, fill: 'url(#glass)'}), wins);
+      el('polygon', {points: '164,151 256,151 236,116 184,116', fill: 'url(#crownG)', class: 'deco'}, g);
+      for (let i = 0; i <= 6; i++) { const t = i / 6; el('line', {x1: 164 + 92 * t, y1: 151, x2: 184 + 52 * t, y2: 116, stroke: 'rgba(20,28,50,.5)', 'stroke-width': 1, class: 'deco'}, g); }
+      for (let r = 0; r < 2; r++) for (let c = 0; c < 10; c++) win(155.5 + c * 11.2, 157 + r * 21.5, 8, 17.5, 'w l');
+      el('rect', {x: 146, y: 150, width: 128, height: 2.5, fill: '#e7cb92', opacity: .85, class: 'deco'}, g);
+      shape = ['polygon', {points: pts}];
+    } else {
+      const w = z.x1 - z.x0, h = z.y1 - z.y0;
+      g.insertBefore(el('rect', {x: z.x0, y: z.y0, width: w, height: h, fill: 'url(#glass)'}), wins);
+      el('rect', {x: z.x0, y: z.y0, width: w, height: h, fill: 'url(#sheen)', class: 'deco'}, g);
+      el('rect', {x: z.x0, y: z.y0, width: 2, height: h, fill: 'rgba(255,255,255,.09)', class: 'deco'}, g);
+      shape = ['rect', {x: z.x0, y: z.y0, width: w, height: h}];
+      if (z.kind === 'lobby') {
+        const n = 6, gap = 7, pw = (w - 24 - gap * (n - 1)) / n;
+        for (let i = 0; i < n; i++) if (i !== 2 && i !== 3) win(z.x0 + 12 + i * (pw + gap), z.y0 + 9, pw, h - 9, 'w l lobby');
+        el('rect', {x: 170, y: z.y0 + 22, width: 80, height: 4, fill: '#c9a46a', class: 'deco'}, g);
+        win(188, z.y0 + 28, 44, h - 28, 'w l door');
+        const t = el('text', {x: 210, y: z.y0 + 17, 'text-anchor': 'middle', fill: '#e7cb92', 'font-size': 7.5, 'letter-spacing': 3, 'font-family': 'Cormorant,serif', 'font-weight': 600, class: 'deco'}, g);
+        t.textContent = 'ALTURA';
+      } else if (z.kind === 'resto') {
+        const n = 9, gap = 5, pw = (w - 20 - gap * (n - 1)) / n;
+        for (let i = 0; i < n; i++) win(z.x0 + 10 + i * (pw + gap), z.y0 + 8, pw, h - 16, 'w l warm');
+      } else if (z.kind === 'spa') {
+        const cols = Math.floor((w - 14) / 14), sx = z.x0 + (w - (cols * 14 - 4)) / 2;
+        for (let r = 0; r < 2; r++) for (let c = 0; c < cols; c++) win(sx + c * 14, z.y0 + 6 + r * 30, 10, 25, 'w l teal');
+        el('rect', {x: 300, y: 699, width: 58, height: 17, fill: 'rgba(140,210,240,.14)', stroke: 'rgba(170,225,250,.6)', 'stroke-width': 1, class: 'deco'}, g);
+        win(302, 702, 54, 7, 'w l teal');
+        el('rect', {x: 302, y: 702, width: 54, height: 7, fill: 'url(#water)', class: 'deco', opacity: .9}, g);
+        shape = ['path', {d: 'M116,650H304V699H358V716H116Z'}];
+      } else {
+        const cols = Math.floor((w - 14) / 10), sx = z.x0 + (w - (cols * 10 - 4)) / 2, rh = h / z.rows;
+        const office = z.kind === 'office';
+        for (let r = 0; r < z.rows; r++) for (let c = 0; c < cols; c++) {
+          const lit = Math.random() < (office ? .55 : .42);
+          win(sx + c * 10, z.y0 + r * rh + 2.2, 6, rh - 4.4, lit ? (office ? 'w l cool' : 'w l') : 'w', lit && !office && Math.random() < .12);
+        }
+      }
+    }
+    el(shape[0], Object.assign({class: 'hl'}, shape[1]), g);
+    el(shape[0], Object.assign({class: 'hit'}, shape[1]), g);
+  });
+  [[200, 136, 284], [340, 124, 296], [496, 112, 308], [650, 112, 308], [716, 80, 340]].forEach(([y, a, b]) => el('rect', {x: a, y: y - 1.5, width: b - a, height: 3, fill: '#34476f', class: 'ledge'}, tower));
+  for (let x = 88; x < 112; x += 6) el('circle', {cx: x, cy: 711, r: 3.4, fill: '#1d3a33', class: 'deco'}, tower);
+  el('rect', {x: 0, y: 960, width: 420, height: 40, fill: '#060a14', class: 'deco'}, tower);
+  el('rect', {x: 50, y: 960, width: 320, height: 1.5, fill: '#33466f', class: 'deco'}, tower);
+  setTimeout(() => { tower.classList.remove('boot'); tower.classList.add('ready'); }, 2600);
+})();
+
+/* interactions */
+const wrap = $('.tower-wrap'), tip = $('.tip'), hint = $('.tower-hint');
+let active = null, demoT = null, touched = false;
+function positionTip(id) {
+  const hl = tower.querySelector(`.zone[data-id="${id}"] .hl`);
+  const zr = hl.getBoundingClientRect(), wr = wrap.getBoundingClientRect(), tw = tip.offsetWidth || 230;
+  let x = zr.right - wr.left + 22, y = zr.top + zr.height / 2 - wr.top;
+  tip.classList.remove('left', 'over');
+  if (wr.left + x + tw > innerWidth - 10) {
+    x = zr.left - wr.left - 22 - tw; tip.classList.add('left');
+    if (wr.left + x < 10) {
+      tip.classList.remove('left'); tip.classList.add('over');
+      x = zr.left - wr.left + zr.width / 2 - tw / 2; y = zr.top - wr.top - 10;
+      x = Math.max(10 - wr.left, Math.min(x, innerWidth - 10 - wr.left - tw));
+    }
+  }
+  tip.style.left = x + 'px'; tip.style.top = y + 'px';
+}
+function setActive(id) {
+  active = id;
+  $$('.zone', tower).forEach(z => z.classList.toggle('active', z.dataset.id === id));
+  tower.classList.toggle('has-active', !!id);
+  $$('.fbtn').forEach(b => b.classList.toggle('active', b.dataset.id === id));
+  if (!id) { tip.classList.remove('show'); return; }
+  const f = byId(id);
+  $('.t-floor', tip).textContent = f.label;
+  $('.t-name', tip).textContent = f.name;
+  $('.t-meta', tip).textContent = f.meta;
+  $('.t-cta', tip).textContent = canHover ? 'Click to visit this floor →' : 'Tap again to visit →';
+  positionTip(id);
+  tip.classList.add('show');
+}
+function go(id) {
+  const t = $(byId(id).target); if (!t) return;
+  window.scrollTo({top: t.getBoundingClientRect().top + scrollY - header.offsetHeight - 14, behavior: reduce ? 'auto' : 'smooth'});
+  const mark = t.classList.contains('room') ? t : ($('.floor-tag i', t) || t);
+  setTimeout(() => { mark.classList.remove('arrive'); void mark.offsetWidth; mark.classList.add('arrive'); }, 750);
+}
+function stopDemo() { if (!touched && active) setActive(null); touched = true; clearTimeout(demoT); hint.style.opacity = 0; }
+$$('.zone', tower).forEach(z => {
+  const id = z.dataset.id;
+  if (canHover) {
+    z.addEventListener('mouseenter', () => { stopDemo(); setActive(id); });
+    z.addEventListener('click', () => go(id));
+  } else {
+    z.addEventListener('click', () => {
+      stopDemo();
+      if (active === id) { go(id); setTimeout(() => setActive(null), 500); } else setActive(id);
+    });
+  }
+  z.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(id); } });
+  z.addEventListener('focus', () => { if (z.matches(':focus-visible')) { stopDemo(); setActive(id); } });
+});
+tower.addEventListener('mouseleave', () => { if (canHover) setActive(null); });
+document.addEventListener('click', e => { if (!canHover && active && !e.target.closest('.zone') && !e.target.closest('.fbtn')) setActive(null); });
+$$('.fbtn').forEach(b => {
+  b.addEventListener('mouseenter', () => { if (canHover) { stopDemo(); setActive(b.dataset.id); } });
+  b.addEventListener('mouseleave', () => { if (canHover) setActive(null); });
+  b.addEventListener('click', () => { stopDemo(); setActive(b.dataset.id); go(b.dataset.id); if (!canHover) setTimeout(() => setActive(null), 600); });
+});
+addEventListener('resize', () => active && positionTip(active));
+if (!reduce) {
+  const seq = ['skybar', 'suite', 'spa', 'restaurant']; let k = 0;
+  const run = () => { if (touched) return; if (k < seq.length) { setActive(seq[k++]); demoT = setTimeout(run, 1500); } else setActive(null); };
+  demoT = setTimeout(run, 2800);
+}
+window.__tower = {setActive, stopDemo};
+
+/* elevator indicator */
+const elev = $('.elev'), en = $('.n', elev), ea = $('.arrow', elev), elbl = $('.lbl', elev);
+let cur = null, animT = null;
+const fmt = n => n === 1 ? 'L' : String(n).padStart(2, '0');
+function showFloor(n, name) {
+  elev.classList.add('show'); elbl.textContent = name;
+  if (cur === null) { cur = n; en.textContent = fmt(n); return; }
+  if (n === cur) return;
+  const dir = n > cur ? 1 : -1; ea.textContent = dir > 0 ? '▲' : '▼'; elev.classList.add('moving');
+  clearInterval(animT);
+  const dt = Math.max(16, Math.min(80, 800 / Math.abs(n - cur)));
+  animT = setInterval(() => { cur += dir; en.textContent = fmt(cur); if (cur === n) { clearInterval(animT); setTimeout(() => elev.classList.remove('moving'), 500); } }, dt);
+}
+const fio = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return;
+  const t = e.target;
+  if (t.dataset.floor) showFloor(+t.dataset.floor, t.dataset.fname); else elev.classList.remove('show');
+}), {rootMargin: '-45% 0px -54% 0px'});
+$$('[data-floor],[data-nofloor]').forEach(s => fio.observe(s));
+elev.addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
+
+/* reveal */
+const rio = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); rio.unobserve(e.target); } }), {rootMargin: '0px 0px -8% 0px'});
+$$('.reveal').forEach(r => rio.observe(r));
+
+/* gallery lightbox */
+const items = $$('.g-item'), lb = $('.lightbox'), lbImg = $('img', lb), lbCap = $('.lb-cap', lb); let li = 0;
+const openLb = i => { li = (i + items.length) % items.length; const im = $('img', items[li]); lbImg.src = im.src; lbImg.alt = im.alt; lbCap.textContent = `${im.alt} · ${li + 1} / ${items.length}`; lb.classList.add('open'); document.body.style.overflow = 'hidden'; };
+const closeLb = () => { lb.classList.remove('open'); document.body.style.overflow = ''; };
+items.forEach((it, i) => it.addEventListener('click', () => openLb(i)));
+$('.lb-prev').onclick = () => openLb(li - 1); $('.lb-next').onclick = () => openLb(li + 1); $('.lb-close').onclick = closeLb;
+lb.addEventListener('click', e => { if (e.target === lb) closeLb(); });
+let sx = 0;
+lb.addEventListener('touchstart', e => sx = e.touches[0].clientX, {passive: true});
+lb.addEventListener('touchend', e => { const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 50) openLb(li + (dx < 0 ? 1 : -1)); });
+
+/* booking */
+const form = $('#bookForm'), ci = form.checkin, co = form.checkout;
+const RATES = {standard: 189, deluxe: 279, suite: 549}, NAMES = {standard: 'Standard City', deluxe: 'Deluxe Skyline', suite: 'Signature Suite'};
+const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const add = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const day = v => new Date(v + 'T12:00');
+const money = v => '$' + v.toLocaleString('en-US');
+const today = new Date();
+ci.min = iso(today); ci.value = iso(add(today, 14)); co.value = iso(add(today, 17)); co.min = iso(add(today, 15));
+ci.addEventListener('change', () => { if (!ci.value) return; co.min = iso(add(day(ci.value), 1)); if (!co.value || day(co.value) <= day(ci.value)) co.value = iso(add(day(ci.value), 3)); });
+const nights = () => { if (!ci.value || !co.value) return 0; const n = Math.round((day(co.value) - day(ci.value)) / 864e5); return n > 0 ? n : 0; };
+function calc() {
+  const room = form.room.value, n = nights(), g = +form.guests.value, base = RATES[room] * n, lines = [];
+  if (form.dinner.checked) lines.push([`Atelier tasting dinner × ${g}`, 95 * g]);
+  if (form.spa.checked) lines.push(['Signature massage', 180]);
+  if (form.transfer.checked) lines.push(['Airport limousine', 65]);
+  $('#sumRoom').textContent = `${NAMES[room]} · ${n} night${n === 1 ? '' : 's'} × $${RATES[room]}`;
+  $('#sumBase').textContent = money(base);
+  $('#sumExtras').innerHTML = lines.map(([l, v]) => `<div class="sum-row"><span>${l}</span><span>${money(v)}</span></div>`).join('');
+  $('#sumTotal').textContent = money(base + lines.reduce((s, l) => s + l[1], 0));
+}
+form.addEventListener('input', calc); form.addEventListener('change', calc); calc();
+const scrollToBooking = () => { const t = $('#booking'); window.scrollTo({top: t.getBoundingClientRect().top + scrollY - header.offsetHeight + 10, behavior: reduce ? 'auto' : 'smooth'}); };
+$$('[data-book]').forEach(b => b.addEventListener('click', e => {
+  e.preventDefault(); const r = b.dataset.book;
+  if (RATES[r]) form.room.value = r;
+  if (r === 'dinner') form.dinner.checked = true;
+  if (r === 'spa') form.spa.checked = true;
+  calc(); scrollToBooking();
+}));
+const modal = $('.modal');
+const closeModal = () => { modal.classList.remove('open'); document.body.style.overflow = ''; };
+$('#mClose').onclick = closeModal;
+modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+const fmtD = v => day(v).toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
+form.addEventListener('submit', e => {
+  e.preventDefault(); let ok = true;
+  $$('[required]', form).forEach(f => {
+    const bad = !f.value.trim() || (f.type === 'email' && !/^\S+@\S+\.\S+$/.test(f.value));
+    f.closest('.field').classList.toggle('err', bad); if (bad) ok = false;
+  });
+  if (nights() < 1) { co.closest('.field').classList.add('err'); ok = false; }
+  if (!ok) { const f = $('.err input, .err select', form); if (f) f.focus(); return; }
+  $('#mName').textContent = form.fullname.value.trim().split(' ')[0];
+  $('#mDetails').textContent = `${NAMES[form.room.value]} · ${fmtD(ci.value)} – ${fmtD(co.value)} · ${$('#sumTotal').textContent}`;
+  modal.classList.add('open'); document.body.style.overflow = 'hidden';
+});
+$$('[required]', form).forEach(f => f.addEventListener('input', () => f.closest('.field').classList.remove('err')));
+
+addEventListener('keydown', e => {
+  if (lb.classList.contains('open')) { if (e.key === 'Escape') closeLb(); if (e.key === 'ArrowLeft') openLb(li - 1); if (e.key === 'ArrowRight') openLb(li + 1); }
+  else if (e.key === 'Escape') { closeModal(); document.body.classList.remove('nav-open'); }
+});
+
+/* mobile booking bar */
+const mbar = $('.mbar'), hero = $('.hero'), bk = $('#booking');
+const upd = () => { const past = hero.getBoundingClientRect().bottom < 60, b = bk.getBoundingClientRect(); mbar.classList.toggle('show', past && !(b.top < innerHeight && b.bottom > 0)); };
+addEventListener('scroll', upd, {passive: true}); upd();
+})();
+</script>
+</body>
+</html>
