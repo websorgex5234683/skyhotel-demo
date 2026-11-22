@@ -113,6 +113,7 @@ ul{list-style:none}
 .tower-col{grid-area:tower;display:flex;align-items:flex-end;justify-content:flex-start;padding-left:6%;position:relative}
 .tower-wrap{position:relative;height:min(80vh,820px);aspect-ratio:420/1000;flex:none}
 .tower-wrap svg{width:100%;height:100%;overflow:visible;display:block}
+.pool{transition:filter .35s}.zone.active .pool{filter:brightness(1.35)}
 .tower-hint{position:absolute;top:13%;left:calc(100% - 20px);white-space:nowrap;display:flex;align-items:center;gap:10px;font-size:12px;color:#cbd1dc;background:rgba(255,255,255,.06);border:1px solid var(--line);padding:7px 14px 7px 10px;border-radius:999px;backdrop-filter:blur(6px);transition:opacity .4s}
 .tower-hint .dot{width:8px;height:8px;border-radius:50%;background:var(--gold2);box-shadow:0 0 0 0 rgba(231,203,146,.6);animation:pulse 2s infinite}
 @keyframes pulse{70%{box-shadow:0 0 0 10px rgba(231,203,146,0)}100%{box-shadow:0 0 0 0 rgba(231,203,146,0)}}
@@ -402,6 +403,24 @@ h2 em{font-style:italic;color:var(--goldd)}
 .mbar span{font-size:12px;color:#aab2c3;line-height:1.2}
 .mbar span b{display:block;color:#fff;font-size:16px;font-family:var(--serif)}
 
+/* clouds + fly-in portal */
+.cloud{position:absolute;pointer-events:none;border-radius:50%;background:radial-gradient(closest-side,rgba(190,203,232,.2),rgba(190,203,232,0));animation:drift linear infinite}
+.c1{width:680px;height:130px;top:28%;left:0;animation-duration:95s}
+.c2{width:520px;height:90px;top:56%;left:0;animation-duration:70s;animation-delay:-35s;z-index:2;opacity:.6}
+@keyframes drift{from{transform:translateX(-40vw)}to{transform:translateX(110vw)}}
+.portal{position:fixed;inset:0;z-index:85;visibility:hidden;overflow:hidden;cursor:pointer}
+.portal.on{visibility:visible}
+.p-bg{position:absolute;inset:0;opacity:0;background:radial-gradient(ellipse 70% 45% at 72% 100%,rgba(201,164,106,.3),transparent 70%),linear-gradient(180deg,#080d1a 0%,#0b1430 50%,#1a2042 100%)}
+.p-tower{position:absolute;inset:0}
+.portal .zone.active{filter:none}
+.p-photo{position:absolute;inset:-2%;background:center/cover no-repeat;opacity:0}
+.p-photo::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(8,13,26,.38),rgba(8,13,26,.82))}
+.p-label{position:absolute;left:0;right:0;top:50%;margin-top:-110px;text-align:center;color:#fff;opacity:0}
+.p-label small{display:block;font-size:12px;letter-spacing:.45em;color:var(--gold2);font-weight:700}
+.pl-n{display:block;font-family:var(--serif);font-weight:500;font-size:clamp(120px,15vw,190px);line-height:.95;font-variant-numeric:tabular-nums;text-shadow:0 10px 40px rgba(0,0,0,.45)}
+.pl-name{font-family:var(--serif);font-style:italic;font-size:clamp(28px,3.4vw,44px);color:var(--gold2)}
+.p-skip{position:absolute;bottom:26px;left:0;right:0;text-align:center;font-size:12px;letter-spacing:.12em;color:rgba(255,255,255,.45)}
+
 /* responsive */
 @media (max-width:1100px){
   .links{display:none}.burger{display:block}
@@ -513,6 +532,7 @@ h2 em{font-style:italic;color:var(--goldd)}
 <section class="hero" id="top" data-nofloor>
   <div class="stars"></div>
   <div class="moon"></div>
+  <div class="cloud c1"></div>
   <svg class="city-bg" id="cityBg" preserveAspectRatio="xMidYMax slice" viewBox="0 0 1600 300" aria-hidden="true"></svg>
   <div class="hero-grid container">
     <div class="hero-text">
@@ -532,11 +552,12 @@ h2 em{font-style:italic;color:var(--goldd)}
     <div class="tower-col">
       <div class="tower-wrap">
         <svg id="tower" class="tower boot" viewBox="0 0 420 1000" role="group" aria-label="Interactive hotel tower. Choose a floor."></svg>
-        <div class="tower-hint"><span class="dot"></span><span class="h-desk">Hover a floor · click to visit</span><span class="h-touch">Tap a floor · tap again to visit</span></div>
+        <div class="tower-hint"><span class="dot"></span><span class="h-desk">Hover a floor · click to fly in</span><span class="h-touch">Tap a floor · tap again to fly in</span></div>
         <div class="tip" aria-hidden="true"><div class="t-floor"></div><div class="t-name"></div><div class="t-meta"></div><div class="t-cta"></div></div>
       </div>
     </div>
   </div>
+  <div class="cloud c2"></div>
 </section>
 
 <div class="stats" data-nofloor>
@@ -896,6 +917,7 @@ h2 em{font-style:italic;color:var(--goldd)}
 </footer>
 
 <button class="elev" aria-label="Back to the tower" title="Back to the tower"><span class="arrow">▲</span><span class="n">L</span><small>FLOOR</small><span class="lbl"></span></button>
+<div class="portal" aria-hidden="true"><div class="p-bg"></div><div class="p-tower"></div><div class="p-photo"></div><div class="p-label"><small>FLOOR</small><b class="pl-n">01</b><span class="pl-name"></span></div><div class="p-skip">Click to skip</div></div>
 <div class="mbar"><span>From<b>$189 / night</b></span><a href="#booking" class="btn btn-gold btn-sm">Book now</a></div>
 
 <div class="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
@@ -979,97 +1001,126 @@ FLOORS.forEach(f => {
   fgrid.appendChild(b);
 });
 
-/* tower */
+/* tower (3D) */
 const tower = $('#tower');
+const UX = .6, UY = -.36, CX = 172, DMAX = 120;
 const ZONES = [
-  {id: 'skybar', kind: 'crown'},
-  {id: 'suite', y0: 200, y1: 340, x0: 140, x1: 280, rows: 13},
-  {id: 'deluxe', y0: 340, y1: 496, x0: 128, x1: 292, rows: 15},
-  {id: 'standard', y0: 496, y1: 650, x0: 116, x1: 304, rows: 15},
-  {id: 'spa', kind: 'spa', y0: 650, y1: 716, x0: 116, x1: 304},
-  {id: 'conference', kind: 'office', y0: 716, y1: 822, x0: 84, x1: 336, rows: 6},
-  {id: 'restaurant', kind: 'resto', y0: 822, y1: 888, x0: 84, x1: 336},
-  {id: 'lobby', kind: 'lobby', y0: 888, y1: 960, x0: 84, x1: 336}
+  {id: 'lobby', kind: 'lobby', y0: 892, y1: 960, w: 240, d: 120},
+  {id: 'restaurant', kind: 'resto', y0: 826, y1: 892, w: 240, d: 120},
+  {id: 'conference', kind: 'office', y0: 718, y1: 826, w: 240, d: 120, rows: 6},
+  {id: 'spa', kind: 'spa', y0: 650, y1: 718, w: 188, d: 94},
+  {id: 'standard', y0: 494, y1: 650, w: 176, d: 88, rows: 15},
+  {id: 'deluxe', y0: 338, y1: 494, w: 160, d: 80, rows: 15},
+  {id: 'suite', y0: 204, y1: 338, w: 144, d: 72, rows: 13},
+  {id: 'skybar', kind: 'crown', y0: 160, y1: 204, w: 124, d: 62}
 ];
+const PHOTOS = {skybar: 'skyline', suite: 'room-suite', deluxe: 'room-deluxe', standard: 'room-standard', spa: 'pool', conference: 'conf', restaurant: 'restaurant', lobby: 'lobby'};
+const P = a => a.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
 const dl = y => Math.round((960 - y) * 1.5 + Math.random() * 450);
+const SP = {};
 (function build() {
   el('defs', {}, tower).innerHTML = `
-    <linearGradient id="glass" x1="0" x2="1"><stop offset="0" stop-color="#24375e"/><stop offset=".2" stop-color="#16243f"/><stop offset=".7" stop-color="#0f1a30"/><stop offset="1" stop-color="#0a1224"/></linearGradient>
-    <linearGradient id="crownG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbe6b4"/><stop offset="1" stop-color="#c0914f" stop-opacity=".75"/></linearGradient>
-    <linearGradient id="water" x1="0" x2="1"><stop offset="0" stop-color="#6fdcf6"/><stop offset="1" stop-color="#2a8fc4"/></linearGradient>
-    <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".42" stop-color="#fff" stop-opacity=".06"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
+    <linearGradient id="glass" x1="0" x2="1"><stop offset="0" stop-color="#2a3e68"/><stop offset=".35" stop-color="#1a2948"/><stop offset="1" stop-color="#121e37"/></linearGradient>
+    <linearGradient id="sideG" x1="0" x2="1"><stop offset="0" stop-color="#0d1628"/><stop offset="1" stop-color="#080e1c"/></linearGradient>
+    <linearGradient id="topG" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#3a4f7e"/><stop offset="1" stop-color="#26365a"/></linearGradient>
+    <linearGradient id="crownG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbe6b4"/><stop offset="1" stop-color="#c0914f"/></linearGradient>
+    <linearGradient id="crownS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b98d50"/><stop offset="1" stop-color="#6e5130"/></linearGradient>
+    <linearGradient id="water" x1="0" x2="1"><stop offset="0" stop-color="#7be3fa"/><stop offset="1" stop-color="#2b8fc6"/></linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".42" stop-color="#fff" stop-opacity=".07"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
     <radialGradient id="glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#e7cb92" stop-opacity=".5"/><stop offset="1" stop-color="#e7cb92" stop-opacity="0"/></radialGradient>
     <linearGradient id="lobbyLight" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe6b0"/><stop offset="1" stop-color="#d89c55"/></linearGradient>`;
-  el('ellipse', {cx: 210, cy: 960, rx: 230, ry: 26, fill: 'url(#glow)', class: 'deco'}, tower);
-  el('ellipse', {cx: 210, cy: 150, rx: 120, ry: 80, fill: 'url(#glow)', class: 'halo deco'}, tower);
-  el('rect', {x: 206, y: 62, width: 8, height: 54, fill: '#1b2a48', class: 'deco'}, tower);
-  el('line', {x1: 210, y1: 12, x2: 210, y2: 64, stroke: '#7f92ba', 'stroke-width': 1.6, class: 'deco'}, tower);
-  el('circle', {cx: 210, cy: 12, r: 8, fill: '#ff5a5a', opacity: .25, class: 'beacon-g deco'}, tower);
-  el('circle', {cx: 210, cy: 12, r: 2.8, fill: '#ff6b6b', class: 'beacon deco'}, tower);
+  el('polygon', {points: P([[6, 974], [330, 974], [416, 922], [92, 922]]), fill: '#0a1224', class: 'deco'}, tower);
+  el('ellipse', {cx: 205, cy: 950, rx: 230, ry: 34, fill: 'url(#glow)', class: 'deco'}, tower);
+  const halo = el('ellipse', {cx: 200, cy: 140, rx: 120, ry: 80, fill: 'url(#glow)', class: 'halo deco'}, tower);
   const zg = el('g', {class: 'zones'}, tower);
 
   ZONES.forEach(z => {
-    const f = byId(z.id);
+    const f = byId(z.id), o = (DMAX - z.d) / 2, w = z.w, h = z.y1 - z.y0;
+    const xL = CX - w / 2 + o * UX, xR = xL + w, yT = z.y0 + o * UY, yB = z.y1 + o * UY, dx = z.d * UX, dy = z.d * UY;
     const g = el('g', {class: 'zone', 'data-id': z.id, tabindex: 0, role: 'button', 'aria-label': `${f.label} — ${f.name}`}, zg);
-    const wins = el('g', {}, g);
-    let shape;
-    const win = (x, y, w, h, cls, tw) => {
-      const r = el('rect', {x, y, width: w, height: h, class: cls}, wins);
+    const lit = (e, cls, y, tw, side) => {
       if (cls.includes(' l')) {
-        r.setAttribute('fill-opacity', rnd(.6, 1).toFixed(2));
+        e.setAttribute('fill-opacity', (side ? rnd(.35, .7) : rnd(.6, 1)).toFixed(2));
         let st = `--d:${dl(y)}ms`;
-        if (tw) { r.classList.add('tw'); st += `;--t:${rnd(10, 22).toFixed(1)}s;--td:${(-rnd(0, 20)).toFixed(1)}s`; }
-        r.setAttribute('style', st);
-      }
+        if (tw) { e.classList.add('tw'); st += `;--t:${rnd(10, 22).toFixed(1)}s;--td:${(-rnd(0, 20)).toFixed(1)}s`; }
+        e.setAttribute('style', st);
+      } else if (side) e.setAttribute('fill-opacity', '.75');
+      return e;
     };
-    if (z.kind === 'crown') {
-      const pts = '150,200 270,200 270,152 258,152 236,114 184,114 162,152 150,152';
-      g.insertBefore(el('polygon', {points: pts, fill: 'url(#glass)'}), wins);
-      el('polygon', {points: '164,151 256,151 236,116 184,116', fill: 'url(#crownG)', class: 'deco'}, g);
-      for (let i = 0; i <= 6; i++) { const t = i / 6; el('line', {x1: 164 + 92 * t, y1: 151, x2: 184 + 52 * t, y2: 116, stroke: 'rgba(20,28,50,.5)', 'stroke-width': 1, class: 'deco'}, g); }
-      for (let r = 0; r < 2; r++) for (let c = 0; c < 10; c++) win(155.5 + c * 11.2, 157 + r * 21.5, 8, 17.5, 'w l');
-      el('rect', {x: 146, y: 150, width: 128, height: 2.5, fill: '#e7cb92', opacity: .85, class: 'deco'}, g);
-      shape = ['polygon', {points: pts}];
+    const fw = (x, y, ww, hh, cls, tw) => lit(el('rect', {x, y, width: ww, height: hh, class: cls}, g), cls, y, tw);
+    const sw = (zA, zB, t, b, cls, tw) => lit(el('polygon', {points: P([[xR + zA * UX, t + zA * UY], [xR + zB * UX, t + zB * UY], [xR + zB * UX, b + zB * UY], [xR + zA * UX, b + zA * UY]]), class: cls}, g), cls, t, tw, true);
+    let poolPath = '';
+    if (z.kind === 'spa') {
+      const a = CX - w / 2 - 40, b = CX - w / 2 - 4, c = o + 8, e = c + 56;
+      const water = [[a + c * UX, 712 + c * UY], [b + c * UX, 712 + c * UY], [b + e * UX, 712 + e * UY], [a + e * UX, 712 + e * UY]];
+      el('polygon', {points: P(water), fill: 'url(#water)', class: 'pool'}, g);
+      el('rect', {x: a + c * UX, y: 712 + c * UY, width: b - a, height: 6, fill: 'rgba(150,220,250,.4)', stroke: 'rgba(190,235,255,.7)', 'stroke-width': .8}, g);
+      poolPath = 'M' + P([water[0], water[3], water[2], water[1], [b + c * UX, 718 + c * UY], [a + c * UX, 718 + c * UY]]).replace(/ /g, 'L') + 'Z';
+    }
+    el('polygon', {points: P([[xL, yT], [xR, yT], [xR + dx, yT + dy], [xL + dx, yT + dy]]), fill: 'url(#topG)'}, g);
+    el('polygon', {points: P([[xR, yT], [xR + dx, yT + dy], [xR + dx, yB + dy], [xR, yB]]), fill: 'url(#sideG)'}, g);
+    el('rect', {x: xL, y: yT, width: w, height: h, fill: 'url(#glass)', class: 'front'}, g);
+    el('rect', {x: xL, y: yT, width: w, height: h, fill: 'url(#sheen)', class: 'deco'}, g);
+    if (z.kind === 'lobby') {
+      const n = 6, gap = 7, pw = (w - 24 - gap * (n - 1)) / n, cx = (xL + xR) / 2;
+      for (let i = 0; i < n; i++) if (i !== 2 && i !== 3) fw(xL + 12 + i * (pw + gap), yT + 9, pw, h - 9, 'w l lobby');
+      for (let c = 0; c < 4; c++) sw(7 + c * 28, 29 + c * 28, yT + 9, yB, 'w l lobby');
+      el('rect', {x: cx - 40, y: yT + 22, width: 80, height: 4, fill: '#c9a46a', class: 'deco'}, g);
+      fw(cx - 22, yT + 28, 44, h - 28, 'w l door');
+      const t = el('text', {x: cx, y: yT + 17, 'text-anchor': 'middle', fill: '#e7cb92', 'font-size': 7.5, 'letter-spacing': 3, 'font-family': 'Cormorant,serif', 'font-weight': 600, class: 'deco'}, g);
+      t.textContent = 'ALTURA';
+    } else if (z.kind === 'resto') {
+      const n = 9, gap = 5, pw = (w - 20 - gap * (n - 1)) / n;
+      for (let i = 0; i < n; i++) fw(xL + 10 + i * (pw + gap), yT + 8, pw, h - 16, 'w l warm');
+      for (let c = 0; c < 4; c++) sw(7 + c * 28, 29 + c * 28, yT + 8, yB - 8, 'w l warm');
+    } else if (z.kind === 'spa') {
+      const cols = Math.floor((w - 14) / 14), sx = xL + (w - (cols * 14 - 4)) / 2, sc = Math.floor((z.d - 8) / 14), ss = (z.d - 10) / sc;
+      for (let r = 0; r < 2; r++) {
+        const t = yT + 6 + r * 30, b = t + 25;
+        for (let c = 0; c < cols; c++) fw(sx + c * 14, t, 10, 25, 'w l teal');
+        for (let c = 0; c < sc; c++) sw(5 + c * ss, 5 + c * ss + ss - 4, t, b, 'w l teal');
+      }
+    } else if (z.kind === 'crown') {
+      const cols = Math.floor((w - 10) / 11.2), sx = xL + (w - (cols * 11.2 - 3.2)) / 2;
+      for (let r = 0; r < 2; r++) {
+        const t = yT + 5 + r * 20;
+        for (let c = 0; c < cols; c++) fw(sx + c * 11.2, t, 8, 16, 'w l');
+        for (let c = 0; c < 4; c++) sw(5 + c * 13, 14 + c * 13, t, t + 16, 'w l');
+      }
     } else {
-      const w = z.x1 - z.x0, h = z.y1 - z.y0;
-      g.insertBefore(el('rect', {x: z.x0, y: z.y0, width: w, height: h, fill: 'url(#glass)'}), wins);
-      el('rect', {x: z.x0, y: z.y0, width: w, height: h, fill: 'url(#sheen)', class: 'deco'}, g);
-      el('rect', {x: z.x0, y: z.y0, width: 2, height: h, fill: 'rgba(255,255,255,.09)', class: 'deco'}, g);
-      shape = ['rect', {x: z.x0, y: z.y0, width: w, height: h}];
-      if (z.kind === 'lobby') {
-        const n = 6, gap = 7, pw = (w - 24 - gap * (n - 1)) / n;
-        for (let i = 0; i < n; i++) if (i !== 2 && i !== 3) win(z.x0 + 12 + i * (pw + gap), z.y0 + 9, pw, h - 9, 'w l lobby');
-        el('rect', {x: 170, y: z.y0 + 22, width: 80, height: 4, fill: '#c9a46a', class: 'deco'}, g);
-        win(188, z.y0 + 28, 44, h - 28, 'w l door');
-        const t = el('text', {x: 210, y: z.y0 + 17, 'text-anchor': 'middle', fill: '#e7cb92', 'font-size': 7.5, 'letter-spacing': 3, 'font-family': 'Cormorant,serif', 'font-weight': 600, class: 'deco'}, g);
-        t.textContent = 'ALTURA';
-      } else if (z.kind === 'resto') {
-        const n = 9, gap = 5, pw = (w - 20 - gap * (n - 1)) / n;
-        for (let i = 0; i < n; i++) win(z.x0 + 10 + i * (pw + gap), z.y0 + 8, pw, h - 16, 'w l warm');
-      } else if (z.kind === 'spa') {
-        const cols = Math.floor((w - 14) / 14), sx = z.x0 + (w - (cols * 14 - 4)) / 2;
-        for (let r = 0; r < 2; r++) for (let c = 0; c < cols; c++) win(sx + c * 14, z.y0 + 6 + r * 30, 10, 25, 'w l teal');
-        el('rect', {x: 300, y: 699, width: 58, height: 17, fill: 'rgba(140,210,240,.14)', stroke: 'rgba(170,225,250,.6)', 'stroke-width': 1, class: 'deco'}, g);
-        win(302, 702, 54, 7, 'w l teal');
-        el('rect', {x: 302, y: 702, width: 54, height: 7, fill: 'url(#water)', class: 'deco', opacity: .9}, g);
-        shape = ['path', {d: 'M116,650H304V699H358V716H116Z'}];
-      } else {
-        const cols = Math.floor((w - 14) / 10), sx = z.x0 + (w - (cols * 10 - 4)) / 2, rh = h / z.rows;
-        const office = z.kind === 'office';
-        for (let r = 0; r < z.rows; r++) for (let c = 0; c < cols; c++) {
-          const lit = Math.random() < (office ? .55 : .42);
-          win(sx + c * 10, z.y0 + r * rh + 2.2, 6, rh - 4.4, lit ? (office ? 'w l cool' : 'w l') : 'w', lit && !office && Math.random() < .12);
-        }
+      const office = z.kind === 'office', cols = Math.floor((w - 14) / 10), sx = xL + (w - (cols * 10 - 4)) / 2, rh = h / z.rows;
+      const sc = Math.max(3, Math.floor((z.d - 8) / 12)), ss = (z.d - 10) / sc;
+      for (let r = 0; r < z.rows; r++) {
+        const t = yT + r * rh + 2.2, b = yT + (r + 1) * rh - 2.2;
+        const pick = () => { const on = Math.random() < (office ? .55 : .42); return [on ? (office ? 'w l cool' : 'w l') : 'w', on && !office && Math.random() < .12]; };
+        for (let c = 0; c < cols; c++) { const [cl, tw] = pick(); fw(sx + c * 10, t, 6, b - t, cl, tw); }
+        for (let c = 0; c < sc; c++) { const [cl, tw] = pick(); sw(5 + c * ss, 5 + c * ss + ss - 4, t, b, cl, tw); }
       }
     }
-    el(shape[0], Object.assign({class: 'hl'}, shape[1]), g);
-    el(shape[0], Object.assign({class: 'hit'}, shape[1]), g);
+    el('polyline', {points: P([[xL, yB], [xL, yT], [xR, yT], [xR + dx, yT + dy]]), fill: 'none', stroke: 'rgba(170,195,245,.4)', 'stroke-width': 1, class: 'deco'}, g);
+    el('line', {x1: xR, y1: yT, x2: xR, y2: yB, stroke: 'rgba(160,190,245,.45)', 'stroke-width': 1.2, class: 'deco'}, g);
+    let outline = [[xL, yB], [xL, yT], [xR, yT], [xR + dx, yT + dy], [xR + dx, yB + dy], [xR, yB]];
+    if (z.kind === 'crown') {
+      const k = 36, a = 8, bi = 26;
+      el('polygon', {points: P([[xL + a, yT], [xR - a, yT], [xR - bi, yT - k], [xL + bi, yT - k]]), fill: 'url(#crownG)', class: 'deco crown-f'}, g);
+      el('polygon', {points: P([[xR - a, yT], [xR - a + dx * .85, yT + dy * .85], [xR - bi + dx * .5, yT - k + dy * .5], [xR - bi, yT - k]]), fill: 'url(#crownS)', class: 'deco'}, g);
+      el('polygon', {points: P([[xL + bi, yT - k], [xR - bi, yT - k], [xR - bi + dx * .5, yT - k + dy * .5], [xL + bi + dx * .5, yT - k + dy * .5]]), fill: '#f7e2b0', class: 'deco'}, g);
+      for (let i = 0; i <= 6; i++) { const t = i / 6; el('line', {x1: xL + a + (w - 2 * a) * t, y1: yT, x2: xL + bi + (w - 2 * bi) * t, y2: yT - k, stroke: 'rgba(40,30,20,.35)', 'stroke-width': .8, class: 'deco'}, g); }
+      el('polyline', {points: P([[xL, yT], [xR, yT], [xR + dx, yT + dy]]), fill: 'none', stroke: '#e7cb92', 'stroke-width': 2, class: 'deco'}, g);
+      SP.x = (xL + xR) / 2 + dx * .25; SP.y = yT - k + dy * .25;
+      outline = [[xL, yB], [xL, yT], [xL + a, yT], [xL + bi, yT - k], [xR - bi, yT - k], [xR - bi + dx * .5, yT - k + dy * .5], [xR + dx, yT + dy], [xR + dx, yB + dy], [xR, yB]];
+    }
+    const d = 'M' + P(outline).replace(/ /g, 'L') + 'Z' + poolPath;
+    el('path', {d, class: 'hl'}, g);
+    el('path', {d, class: 'hit'}, g);
   });
-  [[200, 136, 284], [340, 124, 296], [496, 112, 308], [650, 112, 308], [716, 80, 340]].forEach(([y, a, b]) => el('rect', {x: a, y: y - 1.5, width: b - a, height: 3, fill: '#34476f', class: 'ledge'}, tower));
-  for (let x = 88; x < 112; x += 6) el('circle', {cx: x, cy: 711, r: 3.4, fill: '#1d3a33', class: 'deco'}, tower);
-  el('rect', {x: 0, y: 960, width: 420, height: 40, fill: '#060a14', class: 'deco'}, tower);
-  el('rect', {x: 50, y: 960, width: 320, height: 1.5, fill: '#33466f', class: 'deco'}, tower);
+  halo.setAttribute('cx', SP.x); halo.setAttribute('cy', SP.y + 30);
+  el('rect', {x: SP.x - 4, y: SP.y - 46, width: 8, height: 47, fill: '#1b2a48', class: 'deco'}, tower);
+  el('line', {x1: SP.x, y1: SP.y - 96, x2: SP.x, y2: SP.y - 44, stroke: '#7f92ba', 'stroke-width': 1.6, class: 'deco'}, tower);
+  el('circle', {cx: SP.x, cy: SP.y - 96, r: 8, fill: '#ff5a5a', opacity: .25, class: 'beacon-g deco'}, tower);
+  el('circle', {cx: SP.x, cy: SP.y - 96, r: 2.8, fill: '#ff6b6b', class: 'beacon deco'}, tower);
   setTimeout(() => { tower.classList.remove('boot'); tower.classList.add('ready'); }, 2600);
+  setTimeout(() => Object.values(PHOTOS).forEach(p => { const i = new Image(); i.src = `images/${p}.webp`; }), 3500);
 })();
 
 /* interactions */
@@ -1078,7 +1129,7 @@ let active = null, demoT = null, touched = false;
 function positionTip(id) {
   const hl = tower.querySelector(`.zone[data-id="${id}"] .hl`);
   const zr = hl.getBoundingClientRect(), wr = wrap.getBoundingClientRect(), tw = tip.offsetWidth || 230;
-  let x = zr.right - wr.left + 22, y = zr.top + zr.height / 2 - wr.top;
+  let x = zr.right - wr.left + 18, y = zr.top + zr.height / 2 - wr.top;
   tip.classList.remove('left', 'over');
   if (wr.left + x + tw > innerWidth - 10) {
     x = zr.left - wr.left - 22 - tw; tip.classList.add('left');
@@ -1100,37 +1151,85 @@ function setActive(id) {
   $('.t-floor', tip).textContent = f.label;
   $('.t-name', tip).textContent = f.name;
   $('.t-meta', tip).textContent = f.meta;
-  $('.t-cta', tip).textContent = canHover ? 'Click to visit this floor →' : 'Tap again to visit →';
+  $('.t-cta', tip).textContent = canHover ? 'Click to fly into this floor →' : 'Tap again to fly in →';
   positionTip(id);
   tip.classList.add('show');
+}
+function arrive(t) {
+  const mark = t.classList.contains('room') ? t : ($('.floor-tag i', t) || t);
+  mark.classList.remove('arrive'); void mark.offsetWidth; mark.classList.add('arrive');
 }
 function go(id) {
   const t = $(byId(id).target); if (!t) return;
   window.scrollTo({top: t.getBoundingClientRect().top + scrollY - header.offsetHeight - 14, behavior: reduce ? 'auto' : 'smooth'});
-  const mark = t.classList.contains('room') ? t : ($('.floor-tag i', t) || t);
-  setTimeout(() => { mark.classList.remove('arrive'); void mark.offsetWidth; mark.classList.add('arrive'); }, 750);
+  setTimeout(() => arrive(t), 750); lockFloor(t);
 }
+
+/* fly into the building */
+const portal = $('.portal'), pBg = $('.p-bg', portal), pTower = $('.p-tower', portal), pPhoto = $('.p-photo', portal), pLabel = $('.p-label', portal), plN = $('.pl-n', portal);
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const fmtN = n => n === 1 ? 'L' : String(n).padStart(2, '0');
+let flying = false, skipFly = () => {};
+portal.addEventListener('click', () => skipFly());
+async function flyTo(id) {
+  if (flying) return;
+  stopDemo();
+  if (reduce) { go(id); return; }
+  flying = true;
+  const f = byId(id), t = $(f.target);
+  setActive(id); tip.classList.remove('show');
+  const front = tower.querySelector(`.zone[data-id="${id}"] .front`);
+  const zr = front.getBoundingClientRect(), wr = tower.getBoundingClientRect();
+  const clone = tower.cloneNode(true);
+  clone.removeAttribute('id'); clone.classList.remove('boot'); clone.classList.add('ready');
+  Object.assign(clone.style, {position: 'absolute', left: wr.left + 'px', top: wr.top + 'px', width: wr.width + 'px', height: wr.height + 'px', transformOrigin: '0 0'});
+  pTower.replaceChildren(clone);
+  pPhoto.style.backgroundImage = `url(images/${PHOTOS[id]}.webp)`;
+  $('.pl-name', portal).textContent = f.name;
+  const target = f.num === 'L' ? 1 : +f.num;
+  let n = 1; plN.textContent = fmtN(1);
+  portal.classList.add('on');
+  const s = Math.min(34, Math.max(innerWidth / zr.width, innerHeight / zr.height) * 1.4);
+  const cx = zr.left + zr.width / 2, cy = zr.top + zr.height / 2;
+  const tx = innerWidth / 2 - wr.left - s * (cx - wr.left), ty = innerHeight / 2 - wr.top - s * (cy - wr.top);
+  const anims = [
+    pBg.animate([{opacity: 0}, {opacity: 1}], {duration: 260, fill: 'forwards'}),
+    clone.animate([{transform: 'none'}, {transform: `translate(${tx}px,${ty}px) scale(${s})`}], {duration: 1300, easing: 'cubic-bezier(.65,0,.2,1)', fill: 'forwards'}),
+    pLabel.animate([{opacity: 0, transform: 'translateY(26px)'}, {opacity: 1, transform: 'none'}], {duration: 550, delay: 180, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'forwards'}),
+    pPhoto.animate([{opacity: 0, transform: 'scale(1.4)', filter: 'blur(14px)'}, {opacity: 1, transform: 'scale(1.06)', filter: 'blur(0px)'}], {duration: 800, delay: 750, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'forwards'}),
+    clone.animate([{opacity: 1}, {opacity: 0}], {duration: 380, delay: 1150, fill: 'forwards'})
+  ];
+  const ct = target > 1 ? setInterval(() => { n = Math.min(target, n + 1); plN.textContent = fmtN(n); if (n === target) clearInterval(ct); }, 1150 / (target - 1)) : null;
+  await Promise.race([wait(1950), new Promise(r => skipFly = r)]);
+  clearInterval(ct); plN.textContent = fmtN(target);
+  window.scrollTo({top: t.getBoundingClientRect().top + scrollY - header.offsetHeight - 14, behavior: 'instant'});
+  setActive(null); lockFloor(t);
+  const out = portal.animate([{opacity: 1}, {opacity: 0}], {duration: 600, easing: 'ease', fill: 'forwards'});
+  setTimeout(() => arrive(t), 300);
+  await out.finished;
+  portal.classList.remove('on');
+  anims.forEach(a => a.cancel()); out.cancel();
+  pTower.replaceChildren(); flying = false; skipFly = () => {};
+}
+
 function stopDemo() { if (!touched && active) setActive(null); touched = true; clearTimeout(demoT); hint.style.opacity = 0; }
 $$('.zone', tower).forEach(z => {
   const id = z.dataset.id;
   if (canHover) {
     z.addEventListener('mouseenter', () => { stopDemo(); setActive(id); });
-    z.addEventListener('click', () => go(id));
+    z.addEventListener('click', () => flyTo(id));
   } else {
-    z.addEventListener('click', () => {
-      stopDemo();
-      if (active === id) { go(id); setTimeout(() => setActive(null), 500); } else setActive(id);
-    });
+    z.addEventListener('click', () => { stopDemo(); if (active === id) flyTo(id); else setActive(id); });
   }
-  z.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(id); } });
+  z.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flyTo(id); } });
   z.addEventListener('focus', () => { if (z.matches(':focus-visible')) { stopDemo(); setActive(id); } });
 });
-tower.addEventListener('mouseleave', () => { if (canHover) setActive(null); });
-document.addEventListener('click', e => { if (!canHover && active && !e.target.closest('.zone') && !e.target.closest('.fbtn')) setActive(null); });
+tower.addEventListener('mouseleave', () => { if (canHover && !flying) setActive(null); });
+document.addEventListener('click', e => { if (!canHover && active && !flying && !e.target.closest('.zone') && !e.target.closest('.fbtn')) setActive(null); });
 $$('.fbtn').forEach(b => {
   b.addEventListener('mouseenter', () => { if (canHover) { stopDemo(); setActive(b.dataset.id); } });
-  b.addEventListener('mouseleave', () => { if (canHover) setActive(null); });
-  b.addEventListener('click', () => { stopDemo(); setActive(b.dataset.id); go(b.dataset.id); if (!canHover) setTimeout(() => setActive(null), 600); });
+  b.addEventListener('mouseleave', () => { if (canHover && !flying) setActive(null); });
+  b.addEventListener('click', () => flyTo(b.dataset.id));
 });
 addEventListener('resize', () => active && positionTip(active));
 if (!reduce) {
@@ -1138,7 +1237,7 @@ if (!reduce) {
   const run = () => { if (touched) return; if (k < seq.length) { setActive(seq[k++]); demoT = setTimeout(run, 1500); } else setActive(null); };
   demoT = setTimeout(run, 2800);
 }
-window.__tower = {setActive, stopDemo};
+window.__tower = {setActive, stopDemo, flyTo};
 
 /* elevator indicator */
 const elev = $('.elev'), en = $('.n', elev), ea = $('.arrow', elev), elbl = $('.lbl', elev);
@@ -1153,9 +1252,12 @@ function showFloor(n, name) {
   const dt = Math.max(16, Math.min(80, 800 / Math.abs(n - cur)));
   animT = setInterval(() => { cur += dir; en.textContent = fmt(cur); if (cur === n) { clearInterval(animT); setTimeout(() => elev.classList.remove('moving'), 500); } }, dt);
 }
+let lockUntil = 0;
+function lockFloor(t) { if (t.dataset.floor) { showFloor(+t.dataset.floor, t.dataset.fname); lockUntil = Date.now() + 1600; } }
 const fio = new IntersectionObserver(es => es.forEach(e => {
-  if (!e.isIntersecting) return;
+  if (!e.isIntersecting || Date.now() < lockUntil) return;
   const t = e.target;
+  if (t.classList.contains('room') && e.boundingClientRect.left > innerWidth * .4) return;
   if (t.dataset.floor) showFloor(+t.dataset.floor, t.dataset.fname); else elev.classList.remove('show');
 }), {rootMargin: '-45% 0px -54% 0px'});
 $$('[data-floor],[data-nofloor]').forEach(s => fio.observe(s));
